@@ -18,7 +18,7 @@ export default function Toolbar() {
 
          <div className='flex items-center justify-end space-x-6'>
              <button className='text-sm bg-gray-200 px-4 py-2'>Save changes</button>
-             <button className='flex items-center bg-[#a42569] px-4 py-2 rounded-sm text-white text-sm'>
+             <button className='flex items-center bg-[#e6dffd] px-4 py-2 rounded-sm text-black text-sm'>
                 Publish 
              </button>   
              <BsThreeDotsVertical /> 

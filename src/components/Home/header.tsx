@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <div className='w-full flex items-center px-10 py-5 justify-between'>
           <div className='w-1/2 flex items-center space-x-20 text-sm'> 
-              <h5 className='font-semibold'>Blink</h5>
+              <h5 className='font-semibold'>Q</h5>
               <div className='flex items-center space-x-10 font-semibold'>
                   <h5>How it works</h5>
                   <h5>Features</h5>

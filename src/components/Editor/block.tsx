@@ -13,7 +13,7 @@ export default function Block({item}:{item:any}) {
         onDragStart={(event) => onDragStart(event,item?.text)} draggable
      >
         <h5>{item?.icon}</h5>
-        <h5>{item?.text}</h5>
+        <h5 className='text-sm'>{item?.text}</h5>
 
     </div>
   )

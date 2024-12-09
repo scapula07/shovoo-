@@ -6,33 +6,37 @@ export default function Banner() {
   return (
     <div className='w-full flex flex-col items-center py-20 space-y-8'>
          <div className='w-full flex flex-col items-center'>
-             <h5 className='font-light text-2xl'>Seamless Integration with Blink.ai</h5>
+             <h5 className='font-bold text-2xl'>Over 10k Organizations Trust in our Seamless Integration with</h5>
          </div>   
          <div className='w-full flex items-center justify-center space-x-20'>
               {
                 [
                  {
                     icon:<IoLogoWordpress />,
-                    text:'Wordpress'
+                    text:'Shopify',
+                    img:'/assets/shopify.png'
+
                  },
                  {
                     icon:<FaShopify />,
-                    text:'Shopify'
+                    text:'Shopify',
+                    img:'/assets/woocommerce.png'
                  },
                  {
                     icon:<FaShopify />,
-                    text:'Shopify'
+                    text:'Shopify',
+                    img:'/assets/wordpress.png'
                  },
                  {
                     icon:<FaShopify />,
-                    text:'Livepeer'
+                    text:'Livepeer',
+                    img:'/assets/storj.png'
                  }
 
                  ]?.map((item)=>{
                     return(
                       <div className='flex space-x-2'>
-                           <h5 className='text-5xl'>{item?.icon}</h5>
-                           <h5 className='font-semibold text-2xl'>{item?.text}</h5>
+                         <img src={item.img} />
                       </div>
                     )
                 })}
