@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@shopify/shopify-api": "^11.6.0",
-    "@xyflow/react": "^12.3.5",
     "axios": "^1.7.9",
     "cookie": "^1.0.2",
     "cookies-next": "^5.0.2",
