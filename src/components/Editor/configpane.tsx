@@ -99,7 +99,7 @@ const AppIntegration=({block,item}:{block:any,item:any})=>{
                                 {isLoading?
                                    <ClipLoader size={12} />
                                    :
-                                   "Create connection"
+                                   "Disconnect"
                                 }
                                
                              </button>

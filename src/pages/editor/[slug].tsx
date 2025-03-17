@@ -27,12 +27,10 @@ export default function Editor() {
                <div className='w-full h-full'>
                <ReactFlowProvider>
                     <FlowBoard 
-                     //   open={open}
-                     //   setOpen={setOpen}
-                     //   block={block}
-                     //   setBlock={setBlock}
-                    
-
+                       open={open}
+                       setOpen={setOpen}
+                       block={block}
+                       setBlock={setBlock}
                     />
                 </ReactFlowProvider>
                </div>
