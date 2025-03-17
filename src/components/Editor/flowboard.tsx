@@ -10,7 +10,7 @@ import {
   Background,
 } from "reactflow";
 import { useDnD,DnDProvider } from '@/contexts/dnd';
-import '@xyflow/react/dist/style.css';
+import 'reactflow/dist/style.css';
 import Customblock from './customblock';
 
 
