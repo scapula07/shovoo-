@@ -9,12 +9,24 @@ export default function Block({item}:{item:any}) {
        event.dataTransfer.effectAllowed = 'move';
     };
   return (
-    <div className='flex items-center shadow w-full rounded-lg space-x-4 py-4 px-3'
-        onDragStart={(event) => onDragStart(event,item?.text)} draggable
-     >
-        <h5>{item?.icon}</h5>
-        <h5 className='text-sm'>{item?.text}</h5>
+    <>
+       {item?.text==="Shopify"?
+            <div className='flex items-center shadow w-full rounded-lg space-x-4 py-4 px-3 opacity-40'>
+                <h5>{item?.icon}</h5>
+                <h5 className='text-sm'>{item?.text}</h5>
+            </div>
+          
+                :
+             <div className='flex items-center shadow w-full rounded-lg space-x-4 py-4 px-3'
+                onDragStart={(event) => onDragStart(event,item?.text)} draggable
+              >
+                <h5>{item?.icon}</h5>
+                <h5 className='text-sm'>{item?.text}</h5>
+            </div>
 
-    </div>
+       }
+
+    </>
+
   )
 }

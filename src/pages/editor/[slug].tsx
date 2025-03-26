@@ -18,12 +18,10 @@ export default function Editor() {
   return (
     <div className='w-full h-screen relative'>
           <Toolbar/>
-          <div className='w-full flex h-full'>
-               <div className='w-1/3 h-full bg-white'>
+          <div className='w-full flex h-full'>   
                   <Blocks 
                        setOpenLog={setOpenLog}
                   />
-               </div>
                <div className='w-full h-full'>
                <ReactFlowProvider>
                     <FlowBoard 
@@ -47,9 +45,8 @@ export default function Editor() {
                    </div>
                 )}
                        </div>
-               {openlog&&(
-                  <div className='bg-white h-screen absolute top-0 w-1/4 right-0 border-l border-black'>
-                     
+                {openlog&&(
+                  <div className='bg-white h-screen absolute top-0 w-1/4 right-0 border-l border-black'>       
                       <Logs
                          block={block}
                          setOpen={setOpenLog}

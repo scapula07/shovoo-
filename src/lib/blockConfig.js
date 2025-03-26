@@ -1,125 +1,64 @@
 import { FaShopify } from "react-icons/fa";
-import { FiClock,FiUploadCloud, FiLayers  } from "react-icons/fi";
-
+import { FaFolderOpen ,FaRegImages,FaRegImage,FaCropSimple} from "react-icons/fa6";
+import { FiLayers } from "react-icons/fi";
+import { FaTextSlash } from "react-icons/fa6";
+import { TbBackground,TbResize } from "react-icons/tb";
+import { TfiLayoutMediaOverlay } from "react-icons/tfi";
+import { IoMdRemoveCircleOutline } from "react-icons/io";
 
 export const blocks=[
     {
         text:"Shopify",
         icon:<FaShopify className="text-green-600"/>,
-        type:'app',
-        
+        type:'app',       
      },
      {
-        text:"New product",
-        icon:<FaShopify className="text-green-600"/>,
-        type:'app',
-        
+      text:"Local/Folder",
+      icon:<FaFolderOpen className="text-[#e6dffd]"/>,
+      type:'app',
+      background:'bg-black'
+      
      },
-     {
-         text:"Batch",
-         icon:<FiLayers />,
-         type:'tooling'
-     },
-     {
-        text:"Schedular",
-        icon:<FiClock />,
-        type:'tooling'
-     },
-     {
-         text:"Transcoding",
-         icon:<FaShopify />,
-         type:'app',   
-    },
     {
          text:"Image-to-image",
-         icon:<FiClock />,
+         icon:<FaRegImages />,
          type:'tooling'
     },
     {
          text:"Image-to-text",
-         icon:<FiClock />,
+         icon:<FaTextSlash />,
          type:'tooling'
      },
     {
          text:"Text-to-image",
-         icon:<FiClock />,
+         icon:<FaRegImage />,
          type:'tooling'
      },
      {
       text:"Background removal",
-      icon:<FaShopify />,
-      type:'app',
+      icon:<IoMdRemoveCircleOutline />,
+      type:'tooling',
       
    },
-   {
-      text:"Image moderation",
-      icon:<FiClock />,
-      type:'tooling'
-    },
-   {
-      text:"Image captioning",
-      icon:<FiClock />,
-      type:'tooling'
-    },
-    {
-      text:"Image tagging",
-      icon:<FiClock />,
-      type:'tooling'
-    },
-    {
-      text:"Video tagging",
-      icon:<FiClock />,
-      type:'tooling'
-    },
-    {
-      text:"Edit Media",
-      icon:<FaShopify />,
-      type:'app',
-      
-   },
+
    {
       text:"Crop Media",
-      icon:<FiClock />,
+      icon:<FaCropSimple />,
       type:'tooling'
     },
     {
       text:"Apply Background",
-      icon:<FiClock />,
+      icon:<TbBackground />,
       type:'tooling'
     },
     {
       text:"Resize",
-      icon:<FiClock />,
+      icon:<TbResize />,
       type:'tooling'
     },
     {
       text:"Text overlay",
-      icon:<FiClock />,
+      icon:<TfiLayoutMediaOverlay />,
       type:'tooling'
     },
-    {
-      text:"Image overlay",
-      icon:<FiClock />,
-      type:'tooling'
-    },
-    {
-      text:"Condition",
-      icon:<FiClock />
-     },
-    {
-       text:"Complex Condition",
-       icon:<FiUploadCloud />
-    },
-    {
-       text:"Wait For All",
-       icon:<FiClock />
-    },
-    {
-       text:"Apply For Each",
-       icon:<FiClock />
-    },
-    {
-       text:"Delay",
-       icon:<FiClock />
-      }
 ]
