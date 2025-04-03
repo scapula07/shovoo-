@@ -1,7 +1,6 @@
-import React, { useRef, useCallback, Dispatch } from 'react';
+import React, { useRef, useCallback, Dispatch, useEffect,useMemo } from 'react';
 import {
   ReactFlow,
-
   addEdge,
   useNodesState,
   useEdgesState,
@@ -9,85 +8,233 @@ import {
   useReactFlow,
   Background,
 } from "reactflow";
-import { useDnD,DnDProvider } from '@/contexts/dnd';
+import { useDnD } from '@/contexts/dnd';
 import 'reactflow/dist/style.css';
 import Customblock from './customblock';
+import { useRecoilState } from 'recoil';
+import { executionGraphStore } from '@/recoil';
+
+const initialNodes: any = [];
+
+let id = 0;
+const getId = () => `dndnode_${id++}`;
+
+const nodeTypes = {
+  blockNode: Customblock,
+};
 
 
-  const initialNodes:any = [];
-
-  let id = 0;
-  const getId = () => `dndnode_${id++}`;  
-
-  const nodeTypes = {
-     blockNode: Customblock,
-   };
-  
-
-export default function FlowBoard({open,setOpen,block,setBlock}:{open:boolean,setOpen:Dispatch<React.SetStateAction<boolean>>,block:any,setBlock:Dispatch<React.SetStateAction<any>>}) {
-
-
-
-    const reactFlowWrapper = useRef(null);
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const { screenToFlowPosition } = useReactFlow();
-    const [type] = useDnD();
-
-    const onConnect = useCallback(
-        (params:any) => setEdges((eds) => addEdge(params, eds)),
-        [],
-      );
-
-    const onDragOver = useCallback((event:any) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
-      }, []);
-    
-     const onDrop = useCallback(
-        (event:any) => {
-          event.preventDefault();
-          console.log(type,"type")
-       
-          const nodeType = event.dataTransfer.getData('application/reactflow'); // Retrieve the type from dataTransfer
-          console.log(nodeType,"type")
-          // check if the dropped element is valid
-          if (!nodeType) {
-            return;
-          }
-          const position = screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY,
-          });
-          const newNode = {
-            id: getId(),
-            type:'blockNode',
-            position,
-            data: { label: `${nodeType}` ,setOpen,open,setBlock},
-          };
-          
-          setNodes((nds) => nds.concat(newNode));
-        },
-        [screenToFlowPosition, type],
-      );
-  return (
-    <div className='w-full h-screen' ref={reactFlowWrapper}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          fitView
-          style={{ backgroundColor: "#F7F9FB" }}
-          nodeTypes={nodeTypes}
-        >
-            <Background />
-            <Controls />
-       </ReactFlow>
-    </div>
-  )
+interface ExecutionNode {
+  id: string;
+  class_type: string;
+  inputs: Record<string, [string, number]>;
+  _meta: { title: string };
+  next?: string;
 }
 
+export default function FlowBoard({ open, setOpen, block, setBlock }: { open: boolean, setOpen: Dispatch<React.SetStateAction<boolean>>, block: any, setBlock: Dispatch<React.SetStateAction<any>> }) {
+  const reactFlowWrapper = useRef(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { screenToFlowPosition } = useReactFlow();
+  const [type] = useDnD();
+
+  const [graph,setGraph]=useRecoilState(executionGraphStore)
+
+  const onConnect = useCallback(
+    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    []
+  );
+
+  const onDragOver = useCallback((event: any) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: any) => {
+      event.preventDefault();
+
+      const nodeType = event.dataTransfer.getData('application/reactflow');
+      if (!nodeType) return;
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode = {
+        id: getId(),
+        type: 'blockNode',
+        position,
+        data: { label: `${nodeType}`, setOpen, open, setBlock },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [screenToFlowPosition, type]
+  );
+
+  // Generate Flow Chain JSON
+  // const buildFlowChain = (nodes:any, edges:any) => {
+  //   if (edges.length === 0) return []; // No edges = no flow
+  
+  //   const nodeMap = new Map();
+  //   nodes.forEach((node:any) => nodeMap.set(node.id, { ...node, next: [] }));
+  
+  //   // Build connections based on edges
+  //   edges.forEach((edge:any) => {
+  //     if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
+  //       nodeMap.get(edge.source).next.push(edge.target);
+  //     }
+  //   });
+  
+  //   // Identify start nodes (nodes that are only sources, never targets)
+  //   const targetSet = new Set(edges.map((edge:any) => edge.target));
+  //   const startNodes = edges
+  //     .map((edge:any) => edge.source)
+  //     .filter((source:any)=> !targetSet.has(source)); // Exclude nodes that are targets
+  
+  //   if (startNodes.length === 0) return []; // No valid start node → no valid flow
+  
+  //   let queue = [...new Set(startNodes)]; // Ensure unique entries
+  //   let result = [];
+  //   let step = 1;
+  
+  //   while (queue.length > 0) {
+  //     let currentNodeId = queue.shift();
+  //     let currentNode = nodeMap.get(currentNodeId);
+  
+  //     result.push({
+  //       step,
+  //       id: currentNode.id,
+  //       type: currentNode.data.label, // Extracting label from data
+  //       data: [], 
+  //     });
+  
+  //     step++;
+  
+  //     currentNode.next.forEach((nextNodeId:any)=> {
+  //       queue.push(nextNodeId);
+  //     });
+  //   }
+  
+  //   return result;
+  // };
+  
+
+  // useEffect(() => {
+  //   const flowChain = buildFlowChain(nodes, edges);
+
+  //   console.log("Flow Chain JSON:",flowChain );
+  // }, [nodes, edges]);
+
+
+
+  
+  const convertToExecutionFormat = (nodes:any, edges:any) => {
+    let executionGraph: Record<number, ExecutionNode> = {};
+  
+    // Define nodeMap with correct type
+    const nodeMap = new Map<string, Node>(
+      nodes.map((node:any) => [node.id, node])
+    );
+  
+    const outgoingEdges = new Map<string, string>(); // Maps source node to target node
+    const incomingEdges = new Set<string>(); // Tracks which nodes have incoming edges
+  
+    edges.forEach((edge:any) => {
+      outgoingEdges.set(edge.source, edge.target);
+      incomingEdges.add(edge.target);
+    });
+  
+    let step = 1;
+    let queue = nodes
+      .filter((node:any) => !incomingEdges.has(node.id)) // Start from nodes with no incoming edges
+      .map((node:any) => ({ node, step }));
+  
+    while (queue.length > 0) {
+      let { node, step } = queue.shift()!;
+      let nodeId = node.id;
+      let nodeLabel = (node.data as any)?.label || "DefaultType"; // Ensure `data` exists
+  
+      // Add the node to the execution graph
+      executionGraph[step] = {
+        id: nodeId,
+        class_type: nodeLabel.replace(/\s/g, ""),
+        inputs: {},
+        _meta: { title: nodeLabel },
+      };
+  
+      // Check for the next node
+      if (outgoingEdges.has(nodeId)) {
+        let nextNodeId = outgoingEdges.get(nodeId)!;
+        let nextNode = nodeMap.get(nextNodeId) as any | undefined;
+  
+        if (nextNode) {
+          executionGraph[step].next = (nextNode?.data as any)?.label || null;
+  
+          queue.push({ node: nextNode, step: step + 1 });
+  
+          // Store dependencies
+          let nextStep = step + 1;
+          executionGraph[nextStep] = executionGraph[nextStep] || {
+            id: nextNodeId,
+            class_type: (nextNode.data as any)?.label.replace(/\s/g, "") || "",
+            inputs: {},
+            _meta: { title: (nextNode.data as any)?.label || "" },
+          };
+  
+          executionGraph[nextStep].inputs[nodeId] = [nodeId, 0];
+        }
+      }
+    }
+  
+    return executionGraph;
+  };
+  
+  
+  const executionGraph = useMemo(() => {
+    if (nodes.length === 0 || edges.length === 0) return {};
+    return convertToExecutionFormat(nodes, edges);
+  }, [nodes, edges]);
+  
+  useEffect(() => {
+    if (Object.keys(executionGraph).length > 0) {
+      setGraph((prevGraph) => {
+        const newGraphString = JSON.stringify(executionGraph);
+        const prevGraphString = JSON.stringify(prevGraph);
+        
+        // Only update state if graph has changed
+        if (newGraphString !== prevGraphString) {
+          console.log("Execution JSON Format:", newGraphString);
+          return executionGraph;
+        }
+        
+        return prevGraph; // Avoids unnecessary updates
+      });
+    }
+  }, [executionGraph]);
+  
+  console.log(graph,"graph")
+
+  return (
+    <div className='w-full h-screen' ref={reactFlowWrapper}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        fitView
+        style={{ backgroundColor: "#F7F9FB" }}
+        nodeTypes={nodeTypes}
+      >
+        <Background />
+        <Controls />
+      </ReactFlow>
+    </div>
+  );
+}

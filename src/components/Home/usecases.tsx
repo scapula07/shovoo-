@@ -5,19 +5,20 @@ import FullWidthCarousel from '../Carousel';
 
 export default function UseCases() {
     const carouselItems = [
-        { image: "/assets/1.png", title: "Replace background at scale" },
-        { image: "/assets/2.png", title: "Generate product image variants" },
-        { image: "/assets/3.png", title: "Alt text generation" },
-        { image: "/assets/3.png", title: "Upscale images at scale" },
-        { image: "/assets/3.png", title: "Generate 360 product photography" },
-        { image: "/assets/2.png", title: "Video transcoding" },
-        { image: "/assets/3.png", title: "Automated image editing" },
-        { image: "/assets/3.png", title: "Generate tags and captions for images,videos " },
-        { image: "/assets/3.png", title: "Watermark assets" },
-        { image: "/assets/3.png", title: "Subtitle generation" },
-        { image: "/assets/2.png", title: " Enhance Image Correction " },
-        { image: "/assets/3.png", title: "Scale UGC media" },
-        { image: "/assets/3.png", title: "Generate product Ad Banner" },
+        { image: "/assets/a.png", title: "Replace background at scale" },
+        { image: "/assets/d.png", title: "Generate product image variants" },
+        { image: "/assets/p.png", title: "Scale UGC media" },
+    
+        { image: "/assets/i.png", title: " Enhance Image Correction " },
+      
+        { image: "/assets/k.png", title: "Generate 360 product photography" },
+        { image: "/assets/t.png", title: "Video transcoding" },
+        { image: "/assets/c.png", title: "Alt text generation" },
+        { image: "/assets/g.png", title: "Generate tags and captions for images,videos " },
+        { image: "/assets/h.png", title: "Watermark assets" },
+        { image: "/assets/j.png", title: "Subtitle generation" },     
+        { image: "/assets/e.png", title: "Generate product Ad Banner" },
+        { image: "/assets/b.png", title: "Upscale images at scale" },
 
       ];
       

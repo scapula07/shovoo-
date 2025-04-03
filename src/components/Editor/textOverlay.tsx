@@ -1,6 +1,28 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import {useRecoilState} from "recoil"
+import { executionGraphStore } from "@/recoil";
 
-export default function TextOverlay() {
+interface ToolingProps {
+    block: any;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    item: any;
+    setBlock: React.Dispatch<React.SetStateAction<any>>;
+    setOpenLog: React.Dispatch<React.SetStateAction<boolean>>;
+  }
+export default function TextOverlay({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) {
+    const [graph, setGraph] = useRecoilState(executionGraphStore);
+    const [nodeData, setNodeData] = useState<any>(null);
+  
+   
+  console.log(item?.text,graph,"i")
+    // Find the node in the graph based on the provided text
+    useEffect(() => {
+      if (graph) {
+        const foundNode = Object.values(graph).find((node: any) => node.class_type ===item?.text);
+        console.log(foundNode,"found")
+        setNodeData(foundNode || null);
+      }
+    }, [graph, item?.text]);
   const [state, setState] = useState({
     overlayText: "",
     placement: "Center",

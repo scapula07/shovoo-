@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
+import { useRecoilState } from "recoil";
+import { executionGraphStore } from "@/recoil";
+
 
 const backgrounds = [
   "/images/bg1.jpg",
@@ -7,11 +10,32 @@ const backgrounds = [
   "/images/bg4.jpg",
 ];
 
-const ApplyBackground = () => {
+
+interface ToolingProps {
+    block: any;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    item: any;
+    setBlock: React.Dispatch<React.SetStateAction<any>>;
+    setOpenLog: React.Dispatch<React.SetStateAction<boolean>>;
+  }
+  
+const ApplyBackground = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) => {
   const [mode, setMode] = useState<"color" | "image">("color");
   const [hex, setHex] = useState("#ffffff");
   const [background, setBackground] = useState<string | null>(null);
   const [customBgText, setCustomBgText] = useState("");
+
+
+  const [graph, setGraph] = useRecoilState(executionGraphStore);
+  const [nodeData, setNodeData] = useState<any>(null);
+
+useEffect(() => {
+  if (graph) {
+    const foundNode = Object.values(graph).find((node: any) => node.class_type ===item?.text);
+    console.log(foundNode,"found")
+    setNodeData(foundNode || null);
+  }
+}, [graph, item?.text]);
 
   return (
     <div className="h-screen p-6">

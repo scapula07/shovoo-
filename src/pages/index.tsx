@@ -19,8 +19,8 @@ export default function Home() {
          <UseCases/>
          <HowItWorks />
          <Features/>
-         <Fxsector />
-         <Testimonials />
+         {/* <Fxsector />
+         <Testimonials /> */}
          <Consultation/>
          <Footer />
     </div>

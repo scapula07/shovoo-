@@ -1,7 +1,26 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import {useRecoilState} from "recoil"
+import { executionGraphStore } from "@/recoil";
 
-export default function ResizeMedia() {
+interface ToolingProps {
+    block: any;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    item: any;
+    setBlock: React.Dispatch<React.SetStateAction<any>>;
+    setOpenLog: React.Dispatch<React.SetStateAction<boolean>>;
+  } 
+export default function ResizeMedia({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) {
   const [resize, setResize] = useState({ dimension: "Width", value: "0.7" });
+  const [graph, setGraph] = useRecoilState(executionGraphStore);
+  const [nodeData, setNodeData] = useState<any>(null);
+
+useEffect(() => {
+  if (graph) {
+    const foundNode = Object.values(graph).find((node: any) => node.class_type ===item?.text);
+    console.log(foundNode,"found")
+    setNodeData(foundNode || null);
+  }
+}, [graph, item?.text]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setResize({ ...resize, [e.target.name]: e.target.value });

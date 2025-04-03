@@ -16,6 +16,12 @@
   }
 }
 
+
+#nprogress .bar {
+  background: #a42569 !important;
+  border: 1px solid #a42569 !important;
+} 
+
 body {
   color:black;
   background: white;

@@ -2,11 +2,11 @@ import React from 'react'
 
 export default function Features() {
   return (
-    <div className='py-28 flex flex-col px-10 space-y-6'>
-         <h5 className='text-5xl font-bold'>One  Platform. Unlimited possibilities for all</h5>
-         <p className='w-4/5 text-xl'>Boost productivity across every area or time. Anyone can use Blink to design powerful workflows without relying on developer resources.</p>
+    <div className='py-28 flex flex-col px-10 space-y-2'>
+         <h5 className='text-5xl font-bold'>One Platform for Every Media Need.</h5>
+         <p className='w-[60%] text-2xl'>Ditch the patchwork of third-party tools. Our scalable platform is designed for all your media needs.</p>
 
-         <div className='flex space-x-4'>
+         <div className='flex space-x-4 py-3'>
             {
                 [
                   {

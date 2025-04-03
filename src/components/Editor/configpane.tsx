@@ -84,27 +84,31 @@ const TopBar=({block,setOpen,item}:{block:any,setOpen:Dispatch<React.SetStateAct
 }
 
 
-
-
-const componentsMap: Record<any, ReactElement> = {
-    "Image-to-image": <Image2image />,
-    "Image-to-text": <Image2text />,
-    "Crop Media": <Cropping />,
-    "Background removal": <RemoveBackground />,
-    "Apply Background": <ApplyBackground />,
-    "Resize": <Resize />,
-    "Text overlay": <TextOverlay />,
+const componentsMap: Record<string, React.FC<ToolingProps>> = {
+    "Image-to-image": (props) => <Image2image {...props} />,
+    "Image-to-text": (props) => <Image2text {...props} />,
+    "Crop Media": (props) => <Cropping {...props} />,
+    "Background removal": (props) => <RemoveBackground {...props} />,
+    "Apply Background": (props) => <ApplyBackground {...props} />,
+    "Resize": (props) => <Resize {...props} />,
+    "Text overlay": (props) => <TextOverlay {...props} />,
   };
   
   interface ToolingProps {
     block: any;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    item:any;
+    item: any;
     setBlock: Dispatch<SetStateAction<any>>;
     setOpenLog: Dispatch<SetStateAction<boolean>>;
   }
   
-  const Tooling = ({ item }: ToolingProps) => {
-    return <>{componentsMap[item?.text] || null}</>;
+  const Tooling: React.FC<ToolingProps> = ({ item, block, setOpen, setBlock, setOpenLog }) => {
+    if (!item || !item.text) {
+      return <p>No tool selected</p>;
+    }
+  
+    const Component = componentsMap[item.text];
+  
+    return Component ? <Component block={block} setOpen={setOpen} setBlock={setBlock} setOpenLog={setOpenLog} item={item} /> : <p>Invalid tool</p>;
   };
   

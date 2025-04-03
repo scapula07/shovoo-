@@ -27,7 +27,7 @@ export default function Home() {
                <TaskMetrics/>
 
                <div className='w-full flex py-10 space-x-6'>
-                   <Folders />
+                   {/* <Folders /> */}
                    <RecentWorkflows />
                </div>
           </div>
@@ -43,21 +43,21 @@ const TaskMetrics=()=>{
         <div className='w-full flex space-x-8'>
             {[
                {
-                label:'TASKS ALLOTTED',
+                label:'CREDITS ALLOTTED',
                 value:0,
                 icon:<BiBadgeCheck />,
                 color:'text-yellow-600',
                 bg:'bg-yellow-100'
                },
                {
-                label:'TASKS CONSUMED',
+                label:'CREDITS CONSUMED',
                 value:0,
                 icon:<VscPieChart />,
                 color:'text-blue-600',
                  bg:'bg-blue-100'
                },
                {
-                label:'TASKS REMAINING',
+                label:'CREDITS REMAINING',
                 value:0,
                 icon:<PiChartDonutDuotone />,
                 color:'text-green-600',
