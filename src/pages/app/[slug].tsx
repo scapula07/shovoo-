@@ -15,21 +15,6 @@ export default function Dashboard() {
         </Layout>
       )
    }
-   if(slug==="discover"){
-    return(
-      <Layout>    
-          <Discover />
-      </Layout>
-    )
-   }
-   if(slug==="connections"){
-    return(
-      <Layout>    
-          <Connections />
-      </Layout>
-    )
-   }
-
   return (
     <div>
       

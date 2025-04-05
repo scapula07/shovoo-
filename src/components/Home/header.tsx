@@ -24,7 +24,9 @@ export default function Header() {
                </Link>
            
                             :
-                    <h5 className='border-[#a42569] border rounded-full font-bold text-xl h-10 w-10  flex items-center justify-center'>{user?.email?.slice(0,1)?.toUpperCase()}</h5>    
+              <Link href={"/app/home"}>
+                   <h5 className='border-[#a42569] border rounded-full font-bold text-xl h-10 w-10  flex items-center justify-center'>{user?.email?.slice(0,1)?.toUpperCase()}</h5>   
+               </Link> 
                }
 
 

@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { MdKeyboardArrowRight, MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
-
+import { resizeImg } from "@/lib/ffmpeg/utils";
+import { SDAPI } from "@/lib/ai/utils";
 export default function FileManager({block,item}:{block:any,item:any}) {
   const [files, setFiles] = useState<File[]>([]);
   const [previewURLs, setPreviewURLs] = useState<{ [key: string]: string }>({});
@@ -82,6 +83,14 @@ export default function FileManager({block,item}:{block:any,item:any}) {
     });
   };
 
+  const handleResize = async (file: File) => {
+    const api = new SDAPI();
+
+    const resizedBlob = await api.imageToImage(file,"hat on"); // Resize to 500x500
+  
+  };
+  
+
   return (
     <div className="w-full">
       {/* Navigation */}
@@ -119,7 +128,8 @@ export default function FileManager({block,item}:{block:any,item:any}) {
                   <div className="w-20 bg-gray-300 rounded-full h-2">
                     <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${uploadProgress[file.name]}%` }}></div>
                   </div>
-                  <IoMdTrash className="text-red-500 cursor-pointer" onClick={() => deleteFile(file)} />
+                  <IoMdTrash className="text-red-500 cursor-pointer" onClick={() => deleteFile(file)} /> 
+                
                 </div>
               </div>
             ))}

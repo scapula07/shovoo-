@@ -28,7 +28,7 @@ interface ExecutionNode {
   id: string;
   class_type: string;
   inputs: Record<string, [string, number]>;
-  _meta: { title: string };
+  meta: { title: string };
   next?: string;
 }
 
@@ -75,60 +75,6 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
     [screenToFlowPosition, type]
   );
 
-  // Generate Flow Chain JSON
-  // const buildFlowChain = (nodes:any, edges:any) => {
-  //   if (edges.length === 0) return []; // No edges = no flow
-  
-  //   const nodeMap = new Map();
-  //   nodes.forEach((node:any) => nodeMap.set(node.id, { ...node, next: [] }));
-  
-  //   // Build connections based on edges
-  //   edges.forEach((edge:any) => {
-  //     if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
-  //       nodeMap.get(edge.source).next.push(edge.target);
-  //     }
-  //   });
-  
-  //   // Identify start nodes (nodes that are only sources, never targets)
-  //   const targetSet = new Set(edges.map((edge:any) => edge.target));
-  //   const startNodes = edges
-  //     .map((edge:any) => edge.source)
-  //     .filter((source:any)=> !targetSet.has(source)); // Exclude nodes that are targets
-  
-  //   if (startNodes.length === 0) return []; // No valid start node → no valid flow
-  
-  //   let queue = [...new Set(startNodes)]; // Ensure unique entries
-  //   let result = [];
-  //   let step = 1;
-  
-  //   while (queue.length > 0) {
-  //     let currentNodeId = queue.shift();
-  //     let currentNode = nodeMap.get(currentNodeId);
-  
-  //     result.push({
-  //       step,
-  //       id: currentNode.id,
-  //       type: currentNode.data.label, // Extracting label from data
-  //       data: [], 
-  //     });
-  
-  //     step++;
-  
-  //     currentNode.next.forEach((nextNodeId:any)=> {
-  //       queue.push(nextNodeId);
-  //     });
-  //   }
-  
-  //   return result;
-  // };
-  
-
-  // useEffect(() => {
-  //   const flowChain = buildFlowChain(nodes, edges);
-
-  //   console.log("Flow Chain JSON:",flowChain );
-  // }, [nodes, edges]);
-
 
 
   
@@ -163,7 +109,7 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
         id: nodeId,
         class_type: nodeLabel.replace(/\s/g, ""),
         inputs: {},
-        _meta: { title: nodeLabel },
+        meta: { title: nodeLabel },
       };
   
       // Check for the next node
@@ -182,7 +128,7 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
             id: nextNodeId,
             class_type: (nextNode.data as any)?.label.replace(/\s/g, "") || "",
             inputs: {},
-            _meta: { title: (nextNode.data as any)?.label || "" },
+            meta: { title: (nextNode.data as any)?.label || "" },
           };
   
           executionGraph[nextStep].inputs[nodeId] = [nodeId, 0];

@@ -46,7 +46,7 @@ export default function Layout({children}:Props) {
                         {[
                             {
                                 icon:<GoWorkflow />,
-                                text:'Editing Workflows',
+                                text:'Workflows',
                                 link:"/editor/i"
                             },
                             // {
@@ -55,12 +55,12 @@ export default function Layout({children}:Props) {
                             // },
                             ]?.map((item)=>{
                             return(
-                                <Link href={`${item?.link}`}>
-                                    <div className='flex items-center space-x-3 text-gray-700 hover:bg-[#e6dffd] hover:font-semibold hover:text-purple-600 py-2 px-2 rounded-lg'>
+                               
+                                    <div className='flex items-center space-x-3 text-gray-700  opacity-50  py-2 px-2 rounded-lg'>
                                             <h5 className='text-lg'>{item?.icon}</h5>
                                             <h5 className='text-sm'>{item?.text}</h5>
                                     </div>
-                                </Link>
+                              
                   
                             )})}
 

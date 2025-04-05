@@ -42,13 +42,13 @@ export default function Blocks({setOpenLog}:{setOpenLog:Dispatch<React.SetStateA
                           <h5 className='text-lg font-semibold'>Add Block</h5>
                           <IoMdClose className='text-xl' onClick={()=>setClose(true)}/>
                      </div>
-                     <div className='flex items-center border rounded-lg py-1  border-gray-600 px-4'>
+                     {/* <div className='flex items-center border rounded-lg py-1  border-gray-600 px-4'>
                          <input
                            className='outline-none'
                            placeholder='Search blocks...'
                           />
                          <FiSearch />
-                     </div>
+                     </div> */}
              
                      <div className='w-full flex flex-col space-y-4 py-4 h-full overflow-y-scroll'>
                          {[

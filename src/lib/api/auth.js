@@ -31,6 +31,8 @@ export const authApi= {
              await setDoc(ref,{
                  id:user?.uid,
                  email:user?.email,
+                 totalCredits:100,
+                 usedCredits:0
               })
 
            const docSnap = await getDoc(ref);
