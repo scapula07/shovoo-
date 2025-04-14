@@ -12,6 +12,7 @@
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@shopify/shopify-api": "^11.6.0",
+    "@trigger.dev/sdk": "^3.3.17",
     "@types/nprogress": "^0.2.3",
     "axios": "^1.7.9",
     "cookie": "^1.0.2",

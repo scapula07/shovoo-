@@ -1,4 +1,10 @@
-import React, { useRef, useCallback, Dispatch, useEffect,useMemo } from 'react';
+import React, {
+  useRef,
+  useCallback,
+  Dispatch,
+  useEffect,
+  useMemo,
+} from "react";
 import {
   ReactFlow,
   addEdge,
@@ -8,11 +14,11 @@ import {
   useReactFlow,
   Background,
 } from "reactflow";
-import { useDnD } from '@/contexts/dnd';
-import 'reactflow/dist/style.css';
-import Customblock from './customblock';
-import { useRecoilState } from 'recoil';
-import { executionGraphStore } from '@/recoil';
+import { useDnD } from "@/contexts/dnd";
+import "reactflow/dist/style.css";
+import Customblock from "./customblock";
+import { useRecoilState } from "recoil";
+import { executionGraphStore } from "@/recoil";
 
 const initialNodes: any = [];
 
@@ -23,7 +29,6 @@ const nodeTypes = {
   blockNode: Customblock,
 };
 
-
 interface ExecutionNode {
   id: string;
   class_type: string;
@@ -32,14 +37,24 @@ interface ExecutionNode {
   next?: string;
 }
 
-export default function FlowBoard({ open, setOpen, block, setBlock }: { open: boolean, setOpen: Dispatch<React.SetStateAction<boolean>>, block: any, setBlock: Dispatch<React.SetStateAction<any>> }) {
+export default function FlowBoard({
+  open,
+  setOpen,
+  block,
+  setBlock,
+}: {
+  open: boolean;
+  setOpen: Dispatch<React.SetStateAction<boolean>>;
+  block: any;
+  setBlock: Dispatch<React.SetStateAction<any>>;
+}) {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { screenToFlowPosition } = useReactFlow();
   const [type] = useDnD();
 
-  const [graph,setGraph]=useRecoilState(executionGraphStore)
+  const [graph, setGraph] = useRecoilState(executionGraphStore);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -48,14 +63,14 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = "move";
   }, []);
 
   const onDrop = useCallback(
     (event: any) => {
       event.preventDefault();
 
-      const nodeType = event.dataTransfer.getData('application/reactflow');
+      const nodeType = event.dataTransfer.getData("application/reactflow");
       if (!nodeType) return;
 
       const position = screenToFlowPosition({
@@ -65,7 +80,7 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
 
       const newNode = {
         id: getId(),
-        type: 'blockNode',
+        type: "blockNode",
         position,
         data: { label: `${nodeType}`, setOpen, open, setBlock },
       };
@@ -75,35 +90,32 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
     [screenToFlowPosition, type]
   );
 
-
-
-  
-  const convertToExecutionFormat = (nodes:any, edges:any) => {
+  const convertToExecutionFormat = (nodes: any, edges: any) => {
     let executionGraph: Record<number, ExecutionNode> = {};
-  
+
     // Define nodeMap with correct type
     const nodeMap = new Map<string, Node>(
-      nodes.map((node:any) => [node.id, node])
+      nodes.map((node: any) => [node.id, node])
     );
-  
+
     const outgoingEdges = new Map<string, string>(); // Maps source node to target node
     const incomingEdges = new Set<string>(); // Tracks which nodes have incoming edges
-  
-    edges.forEach((edge:any) => {
+
+    edges.forEach((edge: any) => {
       outgoingEdges.set(edge.source, edge.target);
       incomingEdges.add(edge.target);
     });
-  
+
     let step = 1;
     let queue = nodes
-      .filter((node:any) => !incomingEdges.has(node.id)) // Start from nodes with no incoming edges
-      .map((node:any) => ({ node, step }));
-  
+      .filter((node: any) => !incomingEdges.has(node.id)) // Start from nodes with no incoming edges
+      .map((node: any) => ({ node, step }));
+
     while (queue.length > 0) {
       let { node, step } = queue.shift()!;
       let nodeId = node.id;
       let nodeLabel = (node.data as any)?.label || "DefaultType"; // Ensure `data` exists
-  
+
       // Add the node to the execution graph
       executionGraph[step] = {
         id: nodeId,
@@ -111,17 +123,17 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
         inputs: {},
         meta: { title: nodeLabel },
       };
-  
+
       // Check for the next node
       if (outgoingEdges.has(nodeId)) {
         let nextNodeId = outgoingEdges.get(nodeId)!;
         let nextNode = nodeMap.get(nextNodeId) as any | undefined;
-  
+
         if (nextNode) {
           executionGraph[step].next = (nextNode?.data as any)?.label || null;
-  
+
           queue.push({ node: nextNode, step: step + 1 });
-  
+
           // Store dependencies
           let nextStep = step + 1;
           executionGraph[nextStep] = executionGraph[nextStep] || {
@@ -130,42 +142,39 @@ export default function FlowBoard({ open, setOpen, block, setBlock }: { open: bo
             inputs: {},
             meta: { title: (nextNode.data as any)?.label || "" },
           };
-  
+
           executionGraph[nextStep].inputs[nodeId] = [nodeId, 0];
         }
       }
     }
-  
+
     return executionGraph;
   };
-  
-  
+
   const executionGraph = useMemo(() => {
     if (nodes.length === 0 || edges.length === 0) return {};
     return convertToExecutionFormat(nodes, edges);
   }, [nodes, edges]);
-  
+
   useEffect(() => {
     if (Object.keys(executionGraph).length > 0) {
       setGraph((prevGraph) => {
         const newGraphString = JSON.stringify(executionGraph);
         const prevGraphString = JSON.stringify(prevGraph);
-        
+
         // Only update state if graph has changed
         if (newGraphString !== prevGraphString) {
           console.log("Execution JSON Format:", newGraphString);
           return executionGraph;
         }
-        
+
         return prevGraph; // Avoids unnecessary updates
       });
     }
   }, [executionGraph]);
-  
-  console.log(graph,"graph")
 
   return (
-    <div className='w-full h-screen' ref={reactFlowWrapper}>
+    <div className="w-full h-screen" ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
