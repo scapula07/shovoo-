@@ -3,8 +3,7 @@ import Cropper, { ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { useRecoilState } from "recoil";
 import { executionGraphStore } from "@/recoil";
-
-const images = ["/assets/1.jpg", "/assets/2.jpg", "/assets/3.png"];
+import { useImages } from "@/contexts/useImages";
 
 interface ToolingProps {
   block: any;
@@ -14,7 +13,15 @@ interface ToolingProps {
   setOpenLog: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Cropping = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) => {
+const Cropping = ({
+  block,
+  setOpen,
+  item,
+  setBlock,
+  setOpenLog,
+}: ToolingProps) => {
+  const { images } = useImages();
+
   const cropperRef = createRef<ReactCropperElement>();
   const [image, setImage] = useState(images[0]);
   const [width, setWidth] = useState(300);
@@ -26,7 +33,9 @@ const Cropping = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) 
   // Find node in the graph and update state dynamically
   useEffect(() => {
     if (graph) {
-      const foundNode = Object.values(graph).find((node: any) => node.class_type === item?.text);
+      const foundNode = Object.values(graph).find(
+        (node: any) => node.class_type === item?.text
+      );
       setNodeData(foundNode || null);
     }
   }, [graph, item?.text]);
@@ -53,7 +62,10 @@ const Cropping = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) 
       if (croppedCanvas) {
         const croppedWidth = croppedCanvas.width;
         const croppedHeight = croppedCanvas.height;
-        console.log("Cropped Dimensions:", { width: croppedWidth, height: croppedHeight });
+        console.log("Cropped Dimensions:", {
+          width: croppedWidth,
+          height: croppedHeight,
+        });
 
         setWidth(croppedWidth);
         setHeight(croppedHeight);
@@ -77,7 +89,7 @@ const Cropping = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) 
           zoomTo={0.5}
           initialAspectRatio={1}
           preview=".img-preview"
-          src={image}
+          src={URL.createObjectURL(image)}
           viewMode={1}
           minCropBoxHeight={10}
           minCropBoxWidth={10}
@@ -140,7 +152,10 @@ const Cropping = ({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) 
       </div>
 
       {/* Crop Button */}
-      <button onClick={handleCrop} className="bg-blue-500 text-white p-2 rounded">
+      <button
+        onClick={handleCrop}
+        className="bg-blue-500 text-white p-2 rounded"
+      >
         Crop Image
       </button>
     </div>

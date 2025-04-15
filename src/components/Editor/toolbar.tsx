@@ -55,8 +55,6 @@ export default function Toolbar({ workflow }: any) {
     }
   };
 
-  console.log(workflow);
-
   return (
     <div className="w-full flex px-10 py-8 border-b justify-between">
       <div className="flex w-1/2 ">
@@ -94,7 +92,10 @@ export default function Toolbar({ workflow }: any) {
           {isSave ? "Saving..." : "Save changes"}
         </button>
         {workflow?.publish ? (
-          <button className="flex items-center bg-[#e6dffd] px-4 py-2 rounded-sm text-black text-sm space-x-2">
+          <button
+            className="flex items-center bg-[#e6dffd] px-4 py-2 rounded-sm text-black text-sm space-x-2"
+            onClick={publish}
+          >
             <span>Run Queue</span>
             <FaPlay className="text-white" />
           </button>

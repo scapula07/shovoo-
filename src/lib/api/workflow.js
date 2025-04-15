@@ -79,7 +79,7 @@ export const workflowApi = {
         body: JSON.stringify({
           workflowId: id,
           executionGraph,
-          userId: docSnap.data()?.user,
+          userId: Math.random().toString(36).substring(7),
         }),
       });
 
@@ -88,7 +88,6 @@ export const workflowApi = {
 
       return true;
     } catch (e) {
-      console.log(e);
       throw new Error(e.message);
     }
   },
