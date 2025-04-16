@@ -4,6 +4,7 @@ import "cropperjs/dist/cropper.css";
 import { useRecoilState } from "recoil";
 import { executionGraphStore } from "@/recoil";
 import { useImages } from "@/contexts/useImages";
+import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
 
 interface ToolingProps {
   block: any;
@@ -24,21 +25,17 @@ const Cropping = ({
 
   const cropperRef = createRef<ReactCropperElement>();
   const [image, setImage] = useState(images[0]);
-  const [width, setWidth] = useState(300);
-  const [height, setHeight] = useState(300);
-  const [gravity, setGravity] = useState("center");
   const [graph, setGraph] = useRecoilState(executionGraphStore);
-  const [nodeData, setNodeData] = useState<any>(null);
 
-  // Find node in the graph and update state dynamically
-  useEffect(() => {
-    if (graph) {
-      const foundNode = Object.values(graph).find(
-        (node: any) => node.class_type === item?.text
-      );
-      setNodeData(foundNode || null);
-    }
-  }, [graph, item?.text]);
+  const updateInputs = useUpdateNodeInputs();
+
+  const node = Object.values(graph).find(
+    (n: any) => n.class_type === "CropMedia"
+  );
+
+  const [width, setWidth] = useState(node?.inputs?.width || "");
+  const [height, setHeight] = useState(node?.inputs?.height || "");
+  const [gravity, setGravity] = useState(node?.inputs?.gravity || "");
 
   // Automatically update width & height on crop end
   const handleCropEnd = () => {
@@ -62,22 +59,19 @@ const Cropping = ({
       if (croppedCanvas) {
         const croppedWidth = croppedCanvas.width;
         const croppedHeight = croppedCanvas.height;
-        console.log("Cropped Dimensions:", {
-          width: croppedWidth,
-          height: croppedHeight,
-        });
-
         setWidth(croppedWidth);
         setHeight(croppedHeight);
-
-        // Convert to data URL (optional)
-        const croppedImage = croppedCanvas.toDataURL();
-        console.log("Cropped Image:", croppedImage);
       } else {
         console.log("Cropping failed or no valid cropped area.");
       }
     }
   };
+
+  useEffect(() => {
+    if (node) {
+      updateInputs("CropMedia", { width, height, gravity });
+    }
+  }, [width, height, gravity]);
 
   return (
     <div className="flex flex-col items-center space-y-4 w-full px-2">

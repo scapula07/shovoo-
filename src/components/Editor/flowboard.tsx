@@ -157,20 +157,38 @@ export default function FlowBoard({
   }, [nodes, edges]);
 
   useEffect(() => {
-    if (Object.keys(executionGraph).length > 0) {
-      setGraph((prevGraph) => {
-        const newGraphString = JSON.stringify(executionGraph);
-        const prevGraphString = JSON.stringify(prevGraph);
+    if (Object.keys(executionGraph).length === 0) return;
 
-        // Only update state if graph has changed
-        if (newGraphString !== prevGraphString) {
-          console.log("Execution JSON Format:", newGraphString);
-          return executionGraph;
-        }
+    setGraph((prevGraph) => {
+      const mergedGraph = Object.fromEntries(
+        Object.entries(executionGraph).map(([step, node]) => {
+          const prevNode = prevGraph[step];
 
-        return prevGraph; // Avoids unnecessary updates
-      });
-    }
+          return [
+            step,
+            {
+              ...node,
+              // Preserve inputs if node existed before
+              inputs: prevNode?.inputs ?? node.inputs,
+              meta: {
+                ...node.meta,
+                ...(prevNode?.meta || {}),
+              },
+            },
+          ];
+        })
+      );
+
+      const newGraphString = JSON.stringify(mergedGraph);
+      const prevGraphString = JSON.stringify(prevGraph);
+
+      if (newGraphString !== prevGraphString) {
+        console.log("Execution JSON Format (merged):", newGraphString);
+        return mergedGraph;
+      }
+
+      return prevGraph;
+    });
   }, [executionGraph]);
 
   return (
