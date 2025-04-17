@@ -1,3 +1,11 @@
+"use server";
+
+import { tasks, configure } from "@trigger.dev/sdk/v3";
+
+configure({
+  secretKey: "tr_dev_aAfM9y7tQgO2RqcXnwFE",
+});
+
 import { auth, db } from "@/firebase/config";
 import {
   doc,
@@ -13,7 +21,6 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 export const workflowApi = {
   create: async function (user) {
@@ -71,20 +78,10 @@ export const workflowApi = {
         publish: true,
       });
 
-      const res = await fetch("/api/workflow", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          workflowId: id,
-          executionGraph,
-          userId: Math.random().toString(36).substring(7),
-        }),
+      await tasks.trigger("process-image-workflow", {
+        executionGraph,
+        userId: id,
       });
-
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error);
 
       return true;
     } catch (e) {

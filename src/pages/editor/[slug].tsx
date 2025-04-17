@@ -30,7 +30,7 @@ export default function Editor() {
         setWorkflow({ ...doc?.data(), id: doc?.id });
       });
     }
-  }, []);
+  }, [slug]);
 
   return (
     <ImagesProvider>

@@ -17,6 +17,14 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/contexts/dnd.jsx", "src/components/Editor/flowboard.tsx", "src/lib/blockConfig.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/contexts/dnd.jsx",
+    "src/components/Editor/flowboard.tsx",
+    "src/lib/blockConfig.js",
+    "trigger.config.ts"
+  ],
   "exclude": ["node_modules"]
 }
