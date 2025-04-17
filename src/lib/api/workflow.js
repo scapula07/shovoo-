@@ -1,6 +1,7 @@
 "use server";
 
 import { tasks, configure } from "@trigger.dev/sdk/v3";
+import { getPersistedImages } from "@/utils";
 
 configure({
   secretKey: "tr_dev_aAfM9y7tQgO2RqcXnwFE",
@@ -70,22 +71,28 @@ export const workflowApi = {
     }
   },
   publishWorkflow: async function (executionGraph, id) {
-    try {
-      const ref = doc(db, "workflows", id);
-      const docSnap = await getDoc(ref);
-      await updateDoc(doc(db, "workflows", id), {
-        executionGraph,
-        publish: true,
-      });
+    const files = await getPersistedImages();
+    if (files.length === 0) {
+      throw new Error("No images found");
+    } else {
+      try {
+        const ref = doc(db, "workflows", id);
+        const docSnap = await getDoc(ref);
+        await updateDoc(doc(db, "workflows", id), {
+          executionGraph,
+          publish: true,
+        });
 
-      await tasks.trigger("process-image-workflow", {
-        executionGraph,
-        userId: id,
-      });
+        await tasks.trigger("process-image-workflow", {
+          executionGraph,
+          userId: id,
+          files,
+        });
 
-      return true;
-    } catch (e) {
-      throw new Error(e.message);
+        return true;
+      } catch (e) {
+        throw new Error(e.message);
+      }
     }
   },
   saveChanges: async function (executionGraph, id) {

@@ -1,9 +1,11 @@
 import { task, wait, logger } from "@trigger.dev/sdk/v3";
 import { ExecutionGraph, WorkflowNode } from "@/lib/types/workflow.type";
+import { cropImg } from "../lib/ffmpeg/utils";
 
 type Payload = {
   userId: string;
   executionGraph: ExecutionGraph;
+  files: File[];
 };
 
 const simulateProcessing = async (label: string, delay = 1500) => {
@@ -13,7 +15,7 @@ const simulateProcessing = async (label: string, delay = 1500) => {
 
 export const processImageWorkflow = task({
   id: "process-image-workflow",
-  run: async ({ executionGraph, userId }: Payload) => {
+  run: async ({ executionGraph, userId, files }: Payload) => {
     const nodes = Object.values(executionGraph);
 
     const startNode = nodes[0];
@@ -23,6 +25,7 @@ export const processImageWorkflow = task({
     }
 
     let currentNode: WorkflowNode | undefined = startNode;
+    let processedImages = files;
 
     const visited = new Set<string>();
 
@@ -33,11 +36,27 @@ export const processImageWorkflow = task({
 
       visited.add(currentNode.id);
 
+      const inputs = currentNode.inputs;
+
       try {
         switch (currentNode.meta.title) {
-          case "Crop Media":
-            await wait.for({ seconds: 3 }); // simulate wait
+          case "Crop Media": {
+            const { width, height, gravity } = inputs;
+
+            const croppedResults: File[] = [];
+
+            for (const file of processedImages) {
+              const croppedFile = await cropImg(file, width, height);
+              if (!croppedFile) throw new Error("Crop failed");
+              const resultFile = new File([croppedFile], file.name, {
+                type: "image/png",
+              });
+              croppedResults.push(resultFile);
+            }
+
+            processedImages = croppedResults;
             break;
+          }
 
           case "Apply Background":
             await simulateProcessing("Apply Background");
@@ -69,6 +88,7 @@ export const processImageWorkflow = task({
 
     return {
       status: "completed",
+      images: processedImages,
     };
   },
 });

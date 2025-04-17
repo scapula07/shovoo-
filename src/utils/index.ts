@@ -6,21 +6,32 @@ export const toBase64 = (file: File) =>
     reader.onerror = (e) => reject(e);
   });
 
+export function base64ToFile(
+  base64String: string,
+  filename: string,
+  mimeType = "image/png"
+): File {
+  const byteString = atob(base64String.split(",")[1]);
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+
+  return new File([ab], filename, { type: mimeType });
+}
+
 export const getPersistedImages = async (): Promise<File[]> => {
-  const storedRaw = localStorage.getItem("raw_images");
+  const storedRaw = JSON.parse(localStorage.getItem("raw_images") || "[]") as {
+    base64: string;
+    type: string;
+    name: string;
+  }[];
   if (!storedRaw) return [];
 
-  const stored = JSON.parse(storedRaw) as {
-    name: string;
-    type: string;
-    blobUrl: string;
-  }[];
-
-  const files = await Promise.all(
-    stored.map(async (img) => {
-      const blob = await fetch(img.blobUrl).then((r) => r.blob());
-      return new File([blob], img.name, { type: img.type });
-    })
+  const files = storedRaw.map((b64, idx) =>
+    base64ToFile(b64.base64, `image-${idx}.png`)
   );
 
   return files;
