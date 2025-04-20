@@ -19,3 +19,11 @@ export async function createTempPath(prefix: string): Promise<string> {
 export async function cleanupFiles(filePaths: string[]) {
   await Promise.all(filePaths.map(async (fp) => fs.unlink(fp).catch(() => {})));
 }
+
+
+export async function writeBufferToTemp(buffer: Buffer, extension = "png"): Promise<string> {
+    const tempFilePath = path.join(os.tmpdir(), `image-${Date.now()}.${extension}`);
+    await fs.writeFile(tempFilePath, buffer);
+    return tempFilePath;
+  }
+  

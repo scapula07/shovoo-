@@ -2,7 +2,7 @@ import { useRecoilState } from "recoil";
 import { executionGraphStore } from "@/recoil";
 
 export function useUpdateNodeInputs() {
-  const [graph, setGraph] = useRecoilState(executionGraphStore);
+  const [graph, setGraph] = useRecoilState(executionGraphStore) as any;
 
   const updateInputs = (class_type: string, newInputs: Record<string, any>) => {
     const updatedGraph = { ...graph };

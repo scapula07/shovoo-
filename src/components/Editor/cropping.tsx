@@ -25,11 +25,11 @@ const Cropping = ({
 
   const cropperRef = createRef<ReactCropperElement>();
   const [image, setImage] = useState(images[0]);
-  const [graph, setGraph] = useRecoilState(executionGraphStore);
+  const [graph, setGraph] = useRecoilState(executionGraphStore) as any;
 
   const updateInputs = useUpdateNodeInputs();
 
-  const node = Object.values(graph).find(
+  const node:any= Object.values(graph).find(
     (n: any) => n.class_type === "CropMedia"
   );
 
@@ -146,12 +146,12 @@ const Cropping = ({
       </div>
 
       {/* Crop Button */}
-      <button
+      {/* <button
         onClick={handleCrop}
         className="bg-blue-500 text-white p-2 rounded"
       >
         Crop Image
-      </button>
+      </button> */}
     </div>
   );
 };

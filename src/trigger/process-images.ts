@@ -7,13 +7,29 @@ import fetch from "node-fetch";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
-import {downloadImageToTemp,createTempPath,cleanupFiles} from "../utils/fs.utils"
+import { getStorage, ref, uploadString } from "firebase/storage";
+import { initializeApp } from "firebase/app";
+import {downloadImageToTemp,createTempPath,cleanupFiles,writeBufferToTemp} from "../utils/fs.utils"
 type Payload = {
   workflowId: string;
   executionGraph: ExecutionGraph;
   files:any;
 };
 
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCIFa1gbo2BWLuHAo3Oozozyt5jK_UShVY",
+  authDomain: "devspage-a55cf.firebaseapp.com",
+  projectId: "devspage-a55cf",
+  storageBucket: "devspage-a55cf.appspot.com",
+  messagingSenderId: "91329266555",
+  appId: "1:91329266555:web:72941933425ad1b71ef3de",
+  measurementId: "G-C2NVHD34Y1"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const storage = getStorage(); //
 const aiApi= new SDAPI()
 
 const simulateProcessing = async (label: string, delay = 1500) => {
@@ -24,10 +40,9 @@ const simulateProcessing = async (label: string, delay = 1500) => {
 export const processImageWorkflow = task({
   id: "process-image-workflow",
   run: async ({ executionGraph, workflowId, files }: Payload) => {
-  
-     console.log(files,"ff")
-    const nodes = Object.values(executionGraph);
+    console.log(files, "Initial Files");
 
+    const nodes = Object.values(executionGraph);
     const startNode = nodes[0];
 
     if (!startNode) {
@@ -35,15 +50,21 @@ export const processImageWorkflow = task({
     }
 
     let currentNode: WorkflowNode | undefined = startNode;
-    let processedImages = files;
+    let processedImages: Buffer[] = [];
+
+    // Step 1: Download all image URLs into buffers
+    for (const url of files) {
+      const res = await fetch(url);
+      const buffer = await res.arrayBuffer();
+      processedImages.push(Buffer.from(buffer));
+    }
+
+    console.log(processedImages,"processed images")
 
     const visited = new Set<string>();
 
     while (currentNode) {
-      if (visited.has(currentNode.id)) {
-        break;
-      }
-
+      if (visited.has(currentNode.id)) break;
       visited.add(currentNode.id);
 
       const inputs = currentNode.inputs;
@@ -52,40 +73,61 @@ export const processImageWorkflow = task({
         switch (currentNode.meta.title) {
           case "Crop Media": {
             const { width, height, gravity } = inputs;
+            const cropped: Buffer[] = [];
 
-            const croppedResults: File[] = [];
-        
-            for (const url of processedImages) {
-              await cropImageFromUrl(url, {width, height})
-              // const croppedFile = await cropImg(file, width, height);
-              // if (!croppedFile) throw new Error("Crop failed");
-              // const resultFile = new File([croppedFile], file.name, {
-              //   type: "image/png",
-              // });
-              // croppedResults.push(resultFile);
+            for (const img of processedImages) {
+              const croppedImage = await cropImage(img, { width, height });
+              cropped.push(croppedImage);
             }
 
-            processedImages = croppedResults;
+            processedImages = cropped;
             break;
           }
 
-          case "Apply Background":
-            await simulateProcessing("Apply Background");
-            break;
+          case "Resize": {
+            const { width, height } = inputs;
+            const resized: Buffer[] = [];
+            
+            for (const img of processedImages) {
+              const resizedImage = await resizeImage(img, { width, height });
+              resized.push(resizedImage);
+            }
 
-          case "Text overlay":
-            await simulateProcessing("Text Overlay");
+            processedImages = resized;
             break;
+          }
 
-          case "Resize":
-            await simulateProcessing("Resize");
+          case "Apply Background": {
+            const { backgroundUrl } = inputs;
+            const bgRes = await fetch(backgroundUrl);
+            const backgroundBuffer = Buffer.from(await bgRes.arrayBuffer());
+
+            const withBg: Buffer[] = [];
+
+            for (const img of processedImages) {
+              const composited = await applyBackgroundToImage(img, backgroundBuffer);
+              withBg.push(composited);
+            }
+
+            processedImages = withBg;
             break;
-          
+          }
+
+          case "Text overlay": {
+            const { text, fontSize, fontColor } = inputs;
+            const overlayed: Buffer[] = [];
+
+            for (const img of processedImages) {
+              const withText = await addTextOverlayToImage(img, text, fontSize, fontColor);
+              overlayed.push(withText);
+            }
+
+            processedImages = overlayed;
+            break;
+          }
+
           case "Image-to-text":
             await simulateProcessing("image to text");
-            for (const url of processedImages) {
-                const res = await fetch(url);
-             }
             break;
 
           case "Image-to-image":
@@ -110,11 +152,31 @@ export const processImageWorkflow = task({
 
       const nextTitle: string | undefined = currentNode.next;
       currentNode = nodes.find((n) => n.meta.title === nextTitle);
+
     }
+
+
+
+    const uploadedUrls: string[] = [];
+
+    for (let i = 0; i < processedImages.length; i++) {
+        const base64Image = processedImages[i].toString("base64");
+        const imageRef = ref(storage, `processed/${workflowId}/image-${i}.png`);
+
+      // Upload as base64 string
+        const snapshot =await uploadString(imageRef, base64Image, 'base64');
+   
+        const downloadURL=`https://firebasestorage.googleapis.com/v0/b/${snapshot?.metadata?.bucket}/o/${encodeURIComponent(snapshot?.metadata?.fullPath)}?alt=media`
+   
+      uploadedUrls.push(downloadURL);
+    }
+
+    console.log(uploadedUrls,"urls")
+
 
     return {
       status: "completed",
-      images: processedImages,
+      images:uploadedUrls, 
     };
   },
 });
@@ -123,17 +185,19 @@ export const processImageWorkflow = task({
 
 
 
-export async function cropImageFromUrl(
-  imageUrl: string,
+
+export async function cropImage(
+  input: string | Buffer,
   cropOptions: { width: number; height: number; x?: number; y?: number }
 ): Promise<Buffer> {
   const { width, height, x = 0, y = 0 } = cropOptions;
-  const inputPath = await downloadImageToTemp(imageUrl);
+  const inputPath =
+    typeof input === "string" ? await downloadImageToTemp(input) : await writeBufferToTemp(input);
   const outputPath = await createTempPath("cropped");
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .outputOptions(`-vf`, `crop=${width}:${height}:${x}:${y}`)
+      .outputOptions("-vf", `crop=${width}:${height}:${x}:${y}`)
       .output(outputPath)
       .on("end", resolve)
       .on("error", reject)
@@ -141,7 +205,6 @@ export async function cropImageFromUrl(
   });
 
   const result = await fs.readFile(outputPath);
-  console.log(result,"crop")
   await cleanupFiles([inputPath, outputPath]);
   return result;
 }
@@ -150,16 +213,17 @@ export async function cropImageFromUrl(
 
 
 
-export async function resizeImageFromUrl(
-  imageUrl: string,
+export async function resizeImage(
+  input: string | Buffer,
   size: { width: number; height: number }
 ): Promise<Buffer> {
-  const inputPath = await downloadImageToTemp(imageUrl);
+  const inputPath =
+    typeof input === "string" ? await downloadImageToTemp(input) : await writeBufferToTemp(input);
   const outputPath = await createTempPath("resized");
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .outputOptions(`-vf`, `scale=${size.width}:${size.height}`)
+      .outputOptions("-vf", `scale=${size.width}:${size.height}`)
       .output(outputPath)
       .on("end", resolve)
       .on("error", reject)
@@ -167,18 +231,20 @@ export async function resizeImageFromUrl(
   });
 
   const result = await fs.readFile(outputPath);
-  console.log(result,"rezized")
   await cleanupFiles([inputPath, outputPath]);
   return result;
 }
 
 
+
 export async function applyBackgroundToImage(
-  foregroundUrl: string,
-  backgroundUrl: string
+  foreground: string | Buffer,
+  background: string | Buffer
 ): Promise<Buffer> {
-  const fgPath = await downloadImageToTemp(foregroundUrl);
-  const bgPath = await downloadImageToTemp(backgroundUrl);
+  const fgPath =
+    typeof foreground === "string" ? await downloadImageToTemp(foreground) : await writeBufferToTemp(foreground);
+  const bgPath =
+    typeof background === "string" ? await downloadImageToTemp(background) : await writeBufferToTemp(background);
   const outputPath = await createTempPath("composite");
 
   await new Promise((resolve, reject) => {
@@ -193,20 +259,21 @@ export async function applyBackgroundToImage(
   });
 
   const result = await fs.readFile(outputPath);
-  console.log(result,"apply")
   await cleanupFiles([fgPath, bgPath, outputPath]);
   return result;
 }
 
 
 
+
 export async function addTextOverlayToImage(
-  imageUrl: string,
+  input: string | Buffer,
   text: string,
   fontSize = 24,
   fontColor = "white"
 ): Promise<Buffer> {
-  const inputPath = await downloadImageToTemp(imageUrl);
+  const inputPath =
+    typeof input === "string" ? await downloadImageToTemp(input) : await writeBufferToTemp(input);
   const outputPath = await createTempPath("text");
 
   await new Promise((resolve, reject) => {
@@ -220,6 +287,5 @@ export async function addTextOverlayToImage(
 
   const result = await fs.readFile(outputPath);
   await cleanupFiles([inputPath, outputPath]);
-  console.log(result,"text")
   return result;
 }

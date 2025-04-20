@@ -1,6 +1,8 @@
 import React, { useState,useEffect } from "react";
 import {useRecoilState} from "recoil"
 import { executionGraphStore } from "@/recoil";
+import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
+
 
 interface ToolingProps {
     block: any;
@@ -10,9 +12,16 @@ interface ToolingProps {
     setOpenLog: React.Dispatch<React.SetStateAction<boolean>>;
   } 
 export default function ResizeMedia({ block, setOpen, item, setBlock, setOpenLog }: ToolingProps) {
-  const [resize, setResize] = useState({ dimension: "Width", value: "0.7" });
+    const [resize, setResize] = useState({
+      dimension: "Width",
+      Width: "0.7",
+      Height: ""
+    }) as any;
+  
   const [graph, setGraph] = useRecoilState(executionGraphStore);
   const [nodeData, setNodeData] = useState<any>(null);
+
+  const updateInputs = useUpdateNodeInputs();
 
 useEffect(() => {
   if (graph) {
@@ -22,8 +31,35 @@ useEffect(() => {
   }
 }, [graph, item?.text]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setResize({ ...resize, [e.target.name]: e.target.value });
+console.log(graph,"r")
+useEffect(() => {
+  if (nodeData) {
+    const parsedWidth = parseFloat(resize.Width);
+    const parsedHeight = parseFloat(resize.Height);
+
+    const width = !isNaN(parsedWidth) ? parsedWidth : undefined;
+    const height = !isNaN(parsedHeight) ? parsedHeight : undefined;
+
+    updateInputs("Resize", { width, height });
+  }
+}, [resize]);
+
+
+
+const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+
+  // If the user changes dimension, preserve existing values
+  if (name === "dimension") {
+    setResize((prev:any) => ({ ...prev, dimension: value }));
+  } else {
+    setResize((prev:any) => ({ ...prev, [name]: value }));
+  }
+};
+
+
+
+  
 
   return (
     <div className="p-6 w-full bg-white  rounded-lg">
@@ -52,18 +88,18 @@ useEffect(() => {
         </p>
         <input
           type="text"
-          name="value"
-          value={resize.value}
+          name={resize.dimension} // <- name is now either 'width' or 'height'
+          value={resize[resize?.dimension]}        
           onChange={handleChange}
           className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 focus:ring-purple-300 outline-none"
           placeholder="Enter value..."
         />
       </div>
 
-      <div className="flex justify-end space-x-2">
+      {/* <div className="flex justify-end space-x-2">
         <button className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-200">Cancel</button>
         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Apply</button>
-      </div>
+      </div> */}
     </div>
   );
 }
