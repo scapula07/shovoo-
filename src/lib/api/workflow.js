@@ -4,7 +4,7 @@ import { tasks, configure } from "@trigger.dev/sdk/v3";
 import { getPersistedImages } from "@/utils";
 
 configure({
-  secretKey: "tr_dev_aAfM9y7tQgO2RqcXnwFE",
+  secretKey: "tr_dev_j0McrUUIiFQOtBokPDoH",
 });
 
 import { auth, db } from "@/firebase/config";
@@ -22,6 +22,21 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
+import {getStorage, ref, uploadBytes } from "firebase/storage"
+
+
+const uploadFile=async(file,workflowfile)=>{
+  console.log("Uploading")
+  const storage = getStorage();
+  const fileId=Math.random().toString(36).substring(2,8+2);
+  const storageRef = ref(storage, `/${fileId}`);
+  console.log(storageRef,"shote")
+  const snapshot=await uploadBytes(storageRef, file)
+
+  return `https://firebasestorage.googleapis.com/v0/b/${snapshot?.metadata?.bucket}/o/${snapshot?.metadata?.name}?alt=media`
+
+}
+
 
 export const workflowApi = {
   create: async function (user) {
@@ -70,23 +85,27 @@ export const workflowApi = {
       throw new Error(e.message);
     }
   },
-  publishWorkflow: async function (executionGraph, id) {
+  publishWorkflow: async function (workflowName,executionGraph, id) {
     const files = await getPersistedImages();
+   
     if (files.length === 0) {
-      throw new Error("No images found");
-    } else {
+       throw new Error("No images found");
+      } else {
+        const workflowfile = `workflow_${workflowName}`; // or whatever naming you want
+        const uploadedURLs = [];
+    
+        for (const file of files) {
+          const url = await uploadFile(file, workflowfile);
+          uploadedURLs.push(url);
+        }
+    
       try {
         const ref = doc(db, "workflows", id);
         const docSnap = await getDoc(ref);
         await updateDoc(doc(db, "workflows", id), {
           executionGraph,
           publish: true,
-        });
-
-        await tasks.trigger("process-image-workflow", {
-          executionGraph,
-          userId: id,
-          files,
+          assets: uploadedURLs, 
         });
 
         return true;
@@ -94,6 +113,7 @@ export const workflowApi = {
         throw new Error(e.message);
       }
     }
+    
   },
   saveChanges: async function (executionGraph, id) {
     try {
@@ -116,4 +136,25 @@ export const workflowApi = {
       console.log(e);
     }
   },
+  queueWorkflow: async function (executionGraph, id,assets) {
+     const files = await getPersistedImages();
+   
+     if (files.length === 0) {
+      throw new Error("No images found");
+       } else {
+       try{
+        console.log(files,"file")
+             await tasks.trigger("process-image-workflow", {
+                executionGraph,
+                workflowId: id,
+                files:assets,
+              });
+            
+              return true;
+            
+            }catch(e){
+              console.log(e);
+          }
+    }
+  }
 };

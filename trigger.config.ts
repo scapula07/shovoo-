@@ -1,7 +1,10 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
+import { ffmpeg } from "@trigger.dev/build/extensions/core";
+
+
 
 export default defineConfig({
-  project: "proj_pqubhkswpsysqxxgnvij",
+  project: "proj_fizcagitorcsmnqaoxky",
   runtime: "node",
   logLevel: "log",
   maxDuration: 3600,
@@ -16,4 +19,7 @@ export default defineConfig({
     },
   },
   dirs: ["./src/trigger"],
+  build: {
+    extensions: [ffmpeg()],
+  },
 });

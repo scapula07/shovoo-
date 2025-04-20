@@ -2,6 +2,8 @@ import { getFFmpeg } from ".";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 
+
+
 export const resizeImg = async (file,width,height) => {
     try{
         const ffmpeg = await getFFmpeg();
@@ -91,3 +93,6 @@ export const applyBgToImg = async (foregroundFile, backgroundFile) => {
     console.log("Apply background error:", e);
   }
 };
+
+
+

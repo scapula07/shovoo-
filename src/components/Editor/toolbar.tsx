@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { MdEdit } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { userStore, executionGraphStore } from "@/recoil";
-import { useRecoilValue } from "recoil";
+import {useRecoilValue} from "recoil"
 import { workflowApi } from "@/lib/api/workflow";
 import { IoIosCloseCircle } from "react-icons/io";
 import { FaPlay } from "react-icons/fa6";
+
+
 export default function Toolbar({ workflow }: any) {
   const currentUser = useRecoilValue(userStore);
   const executionGraph = useRecoilValue(executionGraphStore);
@@ -14,7 +16,9 @@ export default function Toolbar({ workflow }: any) {
   const [isLoading, setLoading] = useState(false);
   const [isSave, setSave] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [isProcessing, setProcessing] = useState(false);
 
+  console.log(workflow,"ww")
   useEffect(() => {
     setName(workflow?.name);
   }, [workflow?.id]);
@@ -31,18 +35,37 @@ export default function Toolbar({ workflow }: any) {
   };
 
   const publish = async () => {
-    setLoading(true);
+       setLoading(true);
     try {
       const res = await workflowApi.publishWorkflow(
+        workflow?.name,
         executionGraph,
         workflow?.id
       );
-      setLoading(false);
+     res&& setLoading(false);
     } catch (e) {
       console.log(e);
       setLoading(false);
     }
   };
+
+
+  const run = async () => {
+    setProcessing(true);
+    // if(workflow?.executionGraph) return
+    try {
+      const res = await workflowApi.queueWorkflow(
+        workflow?.executionGraph,
+        workflow?.id,
+        workflow?.assets
+      );
+      res&&setProcessing(false);
+    } catch (e) {
+      console.log(e);
+      setProcessing(false);
+    }
+  };
+
 
   const saveChanges = async () => {
     setSave(true);
@@ -94,17 +117,20 @@ export default function Toolbar({ workflow }: any) {
         {workflow?.publish ? (
           <button
             className="flex items-center bg-[#e6dffd] px-4 py-2 rounded-sm text-black text-sm space-x-2"
-            onClick={publish}
-          >
-            <span>Run Queue</span>
-            <FaPlay className="text-white" />
+            onClick={run}
+          > 
+              {isProcessing ? "Processing..." : 
+                       
+                      <span>Run Queue</span>
+              }
+   
           </button>
         ) : (
           <button
             className="flex items-center bg-[#e6dffd] px-4 py-2 rounded-sm text-black text-sm"
             onClick={publish}
           >
-            {isLoading ? "Publishing..." : "Pubish"}
+            {isLoading ?"Publishing..." : "Pubish"}
           </button>
         )}
 
