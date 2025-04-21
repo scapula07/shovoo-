@@ -143,14 +143,18 @@ export const workflowApi = {
       throw new Error("No images found");
        } else {
        try{
-        console.log(files,"file")
-             await tasks.trigger("process-image-workflow", {
+           const handle = await tasks.trigger("process-image-workflow", {
                 executionGraph,
                 workflowId: id,
                 files:assets,
               });
+            await updateDoc(doc(db, "workflows", id), {
+               runId:handle?.id,
+               accessToken:handle?.publicAccessToken,
+            });
             
-              return true;
+            
+              return handle;
             
             }catch(e){
               console.log(e);

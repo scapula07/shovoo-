@@ -8,7 +8,7 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { FaPlay } from "react-icons/fa6";
 
 
-export default function Toolbar({ workflow }: any) {
+export default function Toolbar({ workflow,setOpenLog}: any) {
   const currentUser = useRecoilValue(userStore);
   const executionGraph = useRecoilValue(executionGraphStore);
   const [name, setName] = useState<string>(workflow?.name);
@@ -59,7 +59,9 @@ export default function Toolbar({ workflow }: any) {
         workflow?.id,
         workflow?.assets
       );
+      console.log(res,"res")
       res&&setProcessing(false);
+      setOpenLog(true)
     } catch (e) {
       console.log(e);
       setProcessing(false);

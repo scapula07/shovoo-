@@ -30,12 +30,13 @@ export default function Configpane({
   block,
   setOpen,
   setBlock,
-  setOpenLog,
+  setOpenLog
 }: {
   block: any;
   setOpen: Dispatch<React.SetStateAction<boolean>>;
   setBlock: Dispatch<React.SetStateAction<any>>;
   setOpenLog: Dispatch<React.SetStateAction<boolean>>;
+
 }) {
   const item = blocks.find((blk) => blk.text === block);
   if (item?.type === "app") {

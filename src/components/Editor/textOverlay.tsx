@@ -1,6 +1,8 @@
 import React, { useState,useEffect } from "react";
 import {useRecoilState} from "recoil"
 import { executionGraphStore } from "@/recoil";
+import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
+import { taskRunErrorEnhancer } from "@trigger.dev/core/v3";
 
 interface ToolingProps {
     block: any;
@@ -13,8 +15,7 @@ export default function TextOverlay({ block, setOpen, item, setBlock, setOpenLog
     const [graph, setGraph] = useRecoilState(executionGraphStore);
     const [nodeData, setNodeData] = useState<any>(null);
   
-   
-  console.log(item?.text,graph,"i")
+    const updateInputs = useUpdateNodeInputs();
     // Find the node in the graph based on the provided text
     useEffect(() => {
       if (graph) {
@@ -29,8 +30,17 @@ export default function TextOverlay({ block, setOpen, item, setBlock, setOpenLog
     fontWeight: "Normal",
   });
 
+  useEffect(() => {
+    if (true) {
+      updateInputs("Textoverlay", { overlayText:state.overlayText });
+    }
+  }, [state,nodeData]);
+
+  console.log(graph,"gg")
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setState({ ...state, [e.target.name]: e.target.value });
+
+  
 
   const renderField = (label: string, name: keyof typeof state, type = "text", options?: string[]) => (
     <div className="mb-4  space-y-2">
@@ -62,10 +72,10 @@ export default function TextOverlay({ block, setOpen, item, setBlock, setOpenLog
       {renderField("Overlay Text", "overlayText")}
       {renderField("Placement", "placement", "select", ["Top Left", "Top Center", "Top Right", "Center", "Bottom Left", "Bottom Center", "Bottom Right"])}
       {renderField("Font Weight", "fontWeight", "select", ["Thin", "Light", "Normal", "Medium", "Bold", "Black"])}
-      <div className="flex justify-end space-x-2">
+      {/* <div className="flex justify-end space-x-2">
         <button className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-200">Cancel</button>
         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</button>
-      </div>
+      </div> */}
     </div>
   );
 }

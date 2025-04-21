@@ -114,11 +114,11 @@ export const processImageWorkflow = task({
           }
 
           case "Text overlay": {
-            const { text, fontSize, fontColor } = inputs;
+            const { overlayText } = inputs;
             const overlayed: Buffer[] = [];
 
             for (const img of processedImages) {
-              const withText = await addTextOverlayToImage(img, text, fontSize, fontColor);
+              const withText = await addTextOverlayToImage(img, overlayText);
               overlayed.push(withText);
             }
 
