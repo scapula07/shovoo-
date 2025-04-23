@@ -85,7 +85,7 @@ const DropDownMenu=({run}:any)=>{
            <div className='w-full grid grid-cols-3  gap-4 py-8 '>
                  {run?.output?.images?.map((i:any)=>{
                     return(
-                        <img src={i}/>
+                        <img src={i} className="h-44"/>
                       )
                  })}
              </div>

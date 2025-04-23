@@ -1,7 +1,7 @@
 import { useState ,useEffect} from "react";
 import { useRecoilState } from "recoil";
 import { executionGraphStore } from "@/recoil";
-
+import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
 
 const backgrounds = [
   "/images/bg1.jpg",
@@ -29,6 +29,10 @@ const ApplyBackground = ({ block, setOpen, item, setBlock, setOpenLog }: Tooling
   const [graph, setGraph] = useRecoilState(executionGraphStore);
   const [nodeData, setNodeData] = useState<any>(null);
 
+  const updateInputs = useUpdateNodeInputs();
+
+  console.log(graph,"gg")
+
 useEffect(() => {
   if (graph) {
     const foundNode = Object.values(graph).find((node: any) => node.class_type ===item?.text);
@@ -36,6 +40,12 @@ useEffect(() => {
     setNodeData(foundNode || null);
   }
 }, [graph, item?.text]);
+
+useEffect(() => {
+  if (true) {
+    updateInputs("ApplyBackground", { background:hex });
+  }
+}, [hex,nodeData]);
 
   return (
     <div className="h-screen p-6">

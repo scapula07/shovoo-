@@ -26,4 +26,6 @@ export async function writeBufferToTemp(buffer: Buffer, extension = "png"): Prom
     await fs.writeFile(tempFilePath, buffer);
     return tempFilePath;
   }
+
+
   

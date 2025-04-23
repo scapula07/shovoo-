@@ -10,6 +10,11 @@ import path from "path";
 import { getStorage, ref, uploadString } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import {downloadImageToTemp,createTempPath,cleanupFiles,writeBufferToTemp} from "../utils/fs.utils"
+import { Blob } from 'fetch-blob'
+
+
+
+
 type Payload = {
   workflowId: string;
   executionGraph: ExecutionGraph;
@@ -96,22 +101,31 @@ export const processImageWorkflow = task({
             processedImages = resized;
             break;
           }
-
           case "Apply Background": {
-            const { backgroundUrl } = inputs;
-            const bgRes = await fetch(backgroundUrl);
-            const backgroundBuffer = Buffer.from(await bgRes.arrayBuffer());
-
+            
+            const { background} = inputs;
+            console.log(background,"background")
             const withBg: Buffer[] = [];
-
+          
+            let backgroundInput;
+          
+            const isHex = /^#([0-9A-F]{3}){1,2}$/i.test(background);
+            if (isHex) {
+              backgroundInput = background; // just pass the hex string directly
+            } else {
+              const bgRes = await fetch(background);
+              backgroundInput = Buffer.from(await bgRes.arrayBuffer());
+            }
+          
             for (const img of processedImages) {
-              const composited = await applyBackgroundToImage(img, backgroundBuffer);
+              const composited = await replaceBackgroundWithWhite(img);
               withBg.push(composited);
             }
-
+          
             processedImages = withBg;
             break;
           }
+          
 
           case "Text overlay": {
             const { overlayText } = inputs;
@@ -134,9 +148,16 @@ export const processImageWorkflow = task({
             await simulateProcessing("image to image");
             break;
 
-          case "Background removal":
-            await simulateProcessing("remove background");
+          case "Background removal": {
+            const bgRemoved: Buffer[] = [];
+            for (const img of processedImages) {
+              const cleaned = await removeBackgroundFromImage(img);
+              bgRemoved.push(cleaned);
+            }
+            processedImages = bgRemoved;
             break;
+          }
+            
 
           default:
             console.warn(`Unknown step: ${currentNode.meta.title}`);
@@ -237,31 +258,59 @@ export async function resizeImage(
 
 
 
-export async function applyBackgroundToImage(
-  foreground: string | Buffer,
-  background: string | Buffer
-): Promise<Buffer> {
+export async function replaceBackgroundWithWhite(foreground: string | Buffer): Promise<Buffer> {
   const fgPath =
-    typeof foreground === "string" ? await downloadImageToTemp(foreground) : await writeBufferToTemp(foreground);
-  const bgPath =
-    typeof background === "string" ? await downloadImageToTemp(background) : await writeBufferToTemp(background);
+    typeof foreground === "string"
+      ? await downloadImageToTemp(foreground)
+      : await writeBufferToTemp(foreground);
+
+  // Get the dimensions of the foreground image
+  const size = { width: 512, height: 512 }; // Default to 512x512 for now
+  try {
+    const ffprobe = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+      ffmpeg.ffprobe(fgPath, (err, metadata) => {
+        if (err) return reject(err);
+        const stream = metadata.streams.find((s) => s.width && s.height);
+        resolve({
+          width: stream?.width ?? 512,
+          height: stream?.height ?? 512,
+        });
+      });
+    });
+    size.width = ffprobe.width;
+    size.height = ffprobe.height;
+  } catch (_) {}
+
+  // Create the white background image with the same dimensions
+  const bgPath = await createWhiteBackground(size.width, size.height);
+
+  // Composite the foreground image onto the white background
   const outputPath = await createTempPath("composite");
 
-  await new Promise((resolve, reject) => {
-    ffmpeg()
-      .input(bgPath)
-      .input(fgPath)
-      .complexFilter(["[1][0]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"])
-      .output(outputPath)
-      .on("end", resolve)
-      .on("error", reject)
-      .run();
-  });
+  // await new Promise<void>((resolve, reject) => {
+  //   ffmpeg()
+  //     .input(bgPath)
+  //     .input(fgPath)
+  //     .complexFilter([
+  //       "[1:v]format=rgba[fg];[0][fg]overlay=(W-w)/2:(H-h)/2:format=auto"
+  //     ])
+  //     .output(outputPath)
+  //     .on("end", resolve)
+  //     .on("error", reject)
+  //     .run();
+  // });
 
   const result = await fs.readFile(outputPath);
   await cleanupFiles([fgPath, bgPath, outputPath]);
   return result;
 }
+
+
+
+
+
+
+
 
 
 
@@ -288,4 +337,58 @@ export async function addTextOverlayToImage(
   const result = await fs.readFile(outputPath);
   await cleanupFiles([inputPath, outputPath]);
   return result;
+}
+
+
+async function createWhiteBackground(width: number, height: number): Promise<string> {
+  const outputPath = await createTempPath("white-bg");
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .input("color=white:s=" + `${width}x${height}`)
+      .inputFormat("lavfi")
+      .outputOptions("-frames:v 1")
+      .output(outputPath)
+      .on("end", () => resolve(outputPath))
+      .on("error", reject)
+      .run();
+  });
+}
+
+
+
+
+
+
+
+export async function removeBackgroundFromImage(input: Buffer): Promise<Buffer> {
+  const tempPath = await writeBufferToTemp(input);
+  const blob = bufferToBlob(input, 'image/png');
+  
+
+  const formData = new FormData();
+  formData.append("image_file", blob);
+  formData.append("size", "auto");
+
+  const res = await fetch("https://api.remove.bg/v1.0/removebg", {
+    method: "POST",
+    headers: {
+      "X-Api-Key":"",
+    },
+    body: formData as any,
+  });
+
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Remove.bg API failed: ${res.status} ${errorText}`);
+  }
+
+  const resultBuffer = Buffer.from(await res.arrayBuffer());
+  await cleanupFiles([tempPath]);
+
+  return resultBuffer;
+}
+
+function bufferToBlob(buffer: Buffer, type: string): Blob {
+  return new Blob([buffer], { type });
 }

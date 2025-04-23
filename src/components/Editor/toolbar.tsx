@@ -72,7 +72,7 @@ export default function Toolbar({ workflow,setOpenLog}: any) {
   const saveChanges = async () => {
     setSave(true);
     try {
-      const res = await workflowApi.saveChanges(executionGraph, workflow?.id);
+      const res = await workflowApi.saveChanges(workflow?.name,executionGraph, workflow?.id);
       setSave(false);
     } catch (e) {
       console.log(e);

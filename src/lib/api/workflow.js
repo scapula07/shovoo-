@@ -115,13 +115,33 @@ export const workflowApi = {
     }
     
   },
-  saveChanges: async function (executionGraph, id) {
+  saveChanges: async function (workflowName,executionGraph, id) {
+       const files = await getPersistedImages();
+   
     try {
       const ref = doc(db, "workflows", id);
       const docSnap = await getDoc(ref);
-      await updateDoc(doc(db, "workflows", id), {
-        executionGraph,
-      });
+      if(files?.length ==docSnap?.data()?.assets?.length){
+          await updateDoc(doc(db, "workflows", id), {
+            executionGraph,
+          });
+
+      }else{
+          const workflowfile = `workflow_${workflowName}`; // or whatever naming you want
+          const uploadedURLs = [];
+      
+          for (const file of files) {
+            const url = await uploadFile(file, workflowfile);
+            uploadedURLs.push(url);
+          }
+    
+      
+        await updateDoc(doc(db, "workflows", id), {
+          executionGraph,
+          assets: uploadedURLs,
+
+        });
+    }
       return true;
     } catch (e) {
       console.log(e);

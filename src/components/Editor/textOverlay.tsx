@@ -2,7 +2,7 @@ import React, { useState,useEffect } from "react";
 import {useRecoilState} from "recoil"
 import { executionGraphStore } from "@/recoil";
 import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
-import { taskRunErrorEnhancer } from "@trigger.dev/core/v3";
+
 
 interface ToolingProps {
     block: any;
@@ -36,7 +36,6 @@ export default function TextOverlay({ block, setOpen, item, setBlock, setOpenLog
     }
   }, [state,nodeData]);
 
-  console.log(graph,"gg")
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setState({ ...state, [e.target.name]: e.target.value });
 
