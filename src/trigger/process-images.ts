@@ -141,11 +141,23 @@ export const processImageWorkflow = task({
           }
 
           case "Image-to-text":
-            await simulateProcessing("image to text");
+            for (const img of processedImages) {
+              const withText = await imageToText(img,);
+              
+            }
+    
             break;
 
           case "Image-to-image":
-            await simulateProcessing("image to image");
+            const { prompt } = inputs;
+            const editedImages: Buffer[] = [];
+
+            for (const img of processedImages) {
+              const withEdited:any = await image2image(img,prompt);
+              editedImages.push(withEdited);
+            }
+
+            processedImages =editedImages
             break;
 
           case "Background removal": {
@@ -217,12 +229,13 @@ export async function cropImage(
   const outputPath = await createTempPath("cropped");
 
   await new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions("-vf", `crop=${width}:${height}:${x}:${y}`)
+      ffmpeg(inputPath)
+      .outputOptions("-vf", `crop=${width}:${height}:(in_w-${width})/2:(in_h-${height})/2`)
       .output(outputPath)
       .on("end", resolve)
       .on("error", reject)
       .run();
+  
   });
 
   const result = await fs.readFile(outputPath);
@@ -318,7 +331,7 @@ export async function replaceBackgroundWithWhite(foreground: string | Buffer): P
 export async function addTextOverlayToImage(
   input: string | Buffer,
   text: string,
-  fontSize = 24,
+  fontSize = 300,
   fontColor = "white"
 ): Promise<Buffer> {
   const inputPath =
@@ -327,11 +340,11 @@ export async function addTextOverlayToImage(
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .videoFilters(`drawtext=text='${text}':fontcolor=${fontColor}:fontsize=${fontSize}:x=10:y=10`)
-      .output(outputPath)
-      .on("end", resolve)
-      .on("error", reject)
-      .run();
+    .videoFilters(`drawtext=text='${text}':fontcolor=${fontColor}:fontsize=${fontSize}:x=(w-text_w)/2:y=h-text_h-10`)
+    .output(outputPath)
+    .on("end", resolve)
+    .on("error", reject)
+    .run();  
   });
 
   const result = await fs.readFile(outputPath);
@@ -360,7 +373,7 @@ async function createWhiteBackground(width: number, height: number): Promise<str
 
 
 
-export async function removeBackgroundFromImage(input: Buffer): Promise<Buffer> {
+ async function removeBackgroundFromImage(input: Buffer): Promise<Buffer> {
   const tempPath = await writeBufferToTemp(input);
   const blob = bufferToBlob(input, 'image/png');
   
@@ -372,7 +385,7 @@ export async function removeBackgroundFromImage(input: Buffer): Promise<Buffer> 
   const res = await fetch("https://api.remove.bg/v1.0/removebg", {
     method: "POST",
     headers: {
-      "X-Api-Key":"",
+      "X-Api-Key":"ruqry3jm11QzcsLNNGGezWoE",
     },
     body: formData as any,
   });
@@ -391,4 +404,59 @@ export async function removeBackgroundFromImage(input: Buffer): Promise<Buffer> 
 
 function bufferToBlob(buffer: Buffer, type: string): Blob {
   return new Blob([buffer], { type });
+}
+
+async function imageToText(input:Buffer) {
+  const endpoint = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-large';
+  const token = ''; // Replace with your actual token
+
+  const imageFile = bufferToBlob(input, 'image/png');
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'image/jpeg'
+    },
+    body: imageFile
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result;
+}
+
+
+async function image2image(input: Buffer, prompt: string): Promise<Buffer | undefined> {
+  try {
+    const imageFile = bufferToBlob(input, 'image/png');
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('text', prompt);
+
+    const resp = await fetch('https://api.deepai.org/api/image-editor', {
+      method: 'POST',
+      headers: {
+        'api-key': ''
+      },
+      body: formData
+    });
+
+    const data: any = await resp.json();
+    const imageUrl = data?.output_url;
+
+    if (!imageUrl) {
+      throw new Error('No image URL returned from DeepAI');
+    }
+
+    const imageResp = await fetch(imageUrl);
+    const arrayBuffer = await imageResp.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (e) {
+    console.error(e);
+    return undefined;
+  }
 }

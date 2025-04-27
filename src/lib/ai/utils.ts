@@ -58,7 +58,8 @@ export class SDAPI {
     
         const form = new FormData();
         form.append('model_id', model_id);
-        form.append('image', file);
+        form.append('image', "https://firebasestorage.googleapis.com/v0/b/devspage-a55cf.appspot.com/o/471juosh?alt=media");
+        form.append('prompt','t');
     
         try {
           const response = await axios.post(url, form, {

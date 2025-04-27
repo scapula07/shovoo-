@@ -48,6 +48,7 @@ export default function Editor() {
                 setOpen={setOpen}
                 block={block}
                 setBlock={setBlock}
+                workflow={workflow}
               />
             </ReactFlowProvider>
           </div>

@@ -7,14 +7,41 @@ import { IoIosArrowDown } from "react-icons/io";
 import { useRealtimeRun } from "@trigger.dev/react-hooks";
 import { ClipLoader } from 'react-spinners';
 import { formatDistanceToNow } from "date-fns";
+import { IoMdDownload } from "react-icons/io";
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatch<React.SetStateAction<boolean>>,  workflow:any}) {
   const { run, error } = useRealtimeRun(workflow?.runId, {
     accessToken: workflow?.accessToken, // This is required
   });
-  console.log(run?.finishedAt,run?.status,"run")
-  console.log(error,"run error")
   const status= run?.status as string
+
+
+  const downloadImagesAsZip = async () => {
+    const zip = new JSZip();
+    const folder = zip.folder("images");
+
+    await Promise.all(
+      run?.output?.images?.map(async (url:string, index:number) => {
+        const proxiedUrl = `/api/image?url=${encodeURIComponent(url)}`;
+
+        const response = await fetch(proxiedUrl);
+        const blob = await response.blob();
+        console.log(blob,"bb")
+        const contentType = response.headers.get('content-type');
+        const ext = contentType?.includes('png') ? 'png' : 'jpg'; // or parse it smarter
+        folder?.file(`image-${index + 1}.${ext}`, blob);
+        
+
+      })
+    );
+
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      saveAs(content, "images.zip");
+    });
+  };
+
   return (
     <div className='w-full'>
             <div className={`flex items-center w-full justify-between px-4 py-4 bg-gray-200`}>
@@ -23,8 +50,9 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
                     </div>
 
                     <div className='flex items-center space-x-3'>
-                        <GrClear />
+                        <IoMdDownload  className='text-xl cursor-pointer' onClick={downloadImagesAsZip}/>
                         <IoMdClose
+                          className='text-xl'
                           onClick={()=>setOpen(false)}
                         />
                     </div>
@@ -32,7 +60,7 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
 
 
             <div className='flex flex-col items-center'>
-                     {run?.status =="EXECUTING"&&
+                     {["EXECUTING","QUEUED"]?.includes?.(status)&&
                           <div className='flex flex-col'>
                                 <div className='flex w-full items-center py-4 space-x-2 justify-center'>
                                       <h5 className="text-sm font-light">Still Processing</h5>

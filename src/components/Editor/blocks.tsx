@@ -92,11 +92,11 @@ export default function Blocks({setOpenLog}:{setOpenLog:Dispatch<React.SetStateA
                                     icon:<FaCropSimple />,
                                     type:'tooling'
                                   },
-                                  {
-                                    text:"Apply Background",
-                                    icon:<TbBackground />,
-                                    type:'tooling'
-                                  },
+                                 //  {
+                                 //    text:"Apply Background",
+                                 //    icon:<TbBackground />,
+                                 //    type:'tooling'
+                                 //  },
                                   {
                                     text:"Resize",
                                     icon:<TbResize />,

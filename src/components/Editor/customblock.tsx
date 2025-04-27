@@ -1,13 +1,15 @@
 import React, { Dispatch, useState, useRef, useEffect } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps,useReactFlow } from 'reactflow';
 import { blocks } from '@/lib/blockConfig';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { IoMdClose } from "react-icons/io";
-export default function Customblock({ data, isConnectable }: NodeProps<{ label: string, open: boolean, setOpen: Dispatch<React.SetStateAction<boolean>>, setBlock: Dispatch<React.SetStateAction<any>> }>) {
+
+
+export default function Customblock({ data, isConnectable }: NodeProps<{id:string, label: string, open: boolean, setOpen: Dispatch<React.SetStateAction<boolean>>, setBlock: Dispatch<React.SetStateAction<any>> }>) {
   const item = blocks.find(block => block.text === data?.label);
   const [openOption, setOpenOption] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
+  const instance = useReactFlow(); 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -23,6 +25,9 @@ export default function Customblock({ data, isConnectable }: NodeProps<{ label: 
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openOption]);
+
+  const id=data?.id
+  console.log(id,"id here")
 
   return (
     <>
@@ -59,13 +64,10 @@ export default function Customblock({ data, isConnectable }: NodeProps<{ label: 
                 <ul className="py-1">
                   <li
                     className="px-3 py-1 hover:bg-gray-200 cursor-pointer text-xs"
-                    onClick={() => console.log('Edit clicked')}
-                  >
-                    Edit
-                  </li>
-                  <li
-                    className="px-3 py-1 hover:bg-gray-200 cursor-pointer text-xs"
-                    onClick={() => console.log('Delete clicked')}
+                    onClick={() => {
+                      instance.deleteElements({ nodes: [{ id }] });
+                      setOpenOption(false);
+                    }}
                   >
                     Delete
                   </li>

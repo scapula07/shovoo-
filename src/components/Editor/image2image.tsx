@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { executionGraphStore } from "@/recoil";
 import { useRecoilState } from "recoil";
+import { useUpdateNodeInputs } from "@/contexts/useUpdateNode";
 
 interface ToolingProps {
     block: any;
@@ -17,8 +18,9 @@ export default function Image2image({ block, setOpen, item, setBlock, setOpenLog
   const [graph, setGraph] = useRecoilState(executionGraphStore);
   const [nodeData, setNodeData] = useState<any>(null);
 
+  const updateInputs = useUpdateNodeInputs();
  
-console.log(item?.text,graph,"i")
+
   // Find the node in the graph based on the provided text
   useEffect(() => {
     if (graph) {
@@ -41,16 +43,7 @@ console.log(item?.text,graph,"i")
     if (nodeData) {
 
 
-    //   setGraph((prev:any) => ({
-    //     ...prev,
-    //     [nodeData.id]: {
-    //       ...prev[nodeData.id], // Preserve existing properties
-    //       inputs: {
-    //         ...prev[nodeData.id]?.inputs, // Preserve existing inputs
-    //         prompt:prompt, // Add new input
-    //       },
-    //     },
-    //   }));
+
 
 
     setGraph((prev:any) => {
@@ -85,10 +78,18 @@ console.log(item?.text,graph,"i")
     setPrompt("");
   };
 
+
+  useEffect(() => {
+    if (true) {
+      updateInputs("Image-to-image", { prompt:prompt });
+    }
+  }, [prompt,nodeData]);
+  
+ console.log(graph,"g")
   return (
     <div className="flex flex-col gap-4 p-4">
       {/* Display the node title if found */}
-      {nodeData ? <h2 className="text-lg font-semibold">{nodeData._meta.title}</h2> : null}
+      {nodeData ? <h2 className="text-lg font-semibold">{nodeData.meta?.title}</h2> : null}
 
       {/* Prompt Section */}
       <div className="w-full p-4 border rounded-lg">
@@ -101,29 +102,12 @@ console.log(item?.text,graph,"i")
           className="w-full p-2 border rounded-md"
         />
         <button
-          onClick={handleGenerate}
           className="mt-2 w-full bg-blue-600 text-white p-2 rounded-md"
         >
           Continue
         </button>
       </div>
 
-      {/* History & Examples Section */}
-      <div className="w-full p-4 border rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">History & Examples</h2>
-        {history.length === 0 ? (
-          <p className="text-gray-500">No history yet. Your prompts will appear here.</p>
-        ) : (
-          <div className="space-y-3">
-            {history.map((item, index) => (
-              <div key={index} className="flex items-center gap-3 border p-2 rounded-md">
-                <img src={item.image} alt="Generated preview" className="w-12 h-12 rounded-md" />
-                <p className="text-sm">{item.prompt}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
