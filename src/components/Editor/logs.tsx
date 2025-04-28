@@ -13,7 +13,7 @@ import { saveAs } from 'file-saver';
 
 export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatch<React.SetStateAction<boolean>>,  workflow:any}) {
   const { run, error } = useRealtimeRun(workflow?.runId, {
-    accessToken: workflow?.accessToken, // This is required
+     accessToken: workflow?.accessToken , // This is required
   });
   const status= run?.status as string
 

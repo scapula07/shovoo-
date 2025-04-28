@@ -46,6 +46,8 @@ export const workflowApi = {
         user: user?.id,
         created: Number(new Date()),
         publish: false,
+        accessToken:"",
+        runId:""
       });
       return snap?.id;
     } catch (e) {
