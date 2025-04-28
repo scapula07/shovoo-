@@ -4,7 +4,7 @@ import { tasks, configure } from "@trigger.dev/sdk/v3";
 import { getPersistedImages } from "@/utils";
 
 configure({
-  secretKey:process.env.TRIGGER_API_SECRET ,
+  secretKey:process.env.NEXT_PUBLIC_TRIGGER_API_SECRET ,
 });
 
 import { auth, db } from "@/firebase/config";
@@ -159,6 +159,7 @@ export const workflowApi = {
     }
   },
   queueWorkflow: async function (executionGraph, id,assets) {
+    console.log(process.env.TRIGGER_API_SECRET,"key")
      const files = await getPersistedImages();
    
      if (files.length === 0) {

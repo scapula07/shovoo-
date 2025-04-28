@@ -13,7 +13,7 @@ import {downloadImageToTemp,createTempPath,cleanupFiles,writeBufferToTemp} from 
 import { Blob } from 'fetch-blob'
 
 
-console.log(process.env.TRIGGER_API_SECRET,'tt')
+console.log(process.env.NEXT_PUBLIC_TRIGGER_API_SECRET,'tt')
 
 type Payload = {
   workflowId: string;
@@ -385,7 +385,7 @@ async function createWhiteBackground(width: number, height: number): Promise<str
   const res = await fetch("https://api.remove.bg/v1.0/removebg", {
     method: "POST",
     headers: {
-      "X-Api-Key": process.env.RMBG_API_KEY! ,
+      "X-Api-Key": process.env.NEXT_PUBLIC_RMBG_API_KEY! ,
     },
     body: formData as any,
   });
@@ -408,7 +408,7 @@ function bufferToBlob(buffer: Buffer, type: string): Blob {
 
 async function imageToText(input:Buffer) {
   const endpoint = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-large';
-  const token = process.env.HF_API_KEY; // Replace with your actual token
+  const token = process.env.NEXT_PUBLIC_HF_API_KEY; // Replace with your actual token
 
   const imageFile = bufferToBlob(input, 'image/png');
 
@@ -440,7 +440,7 @@ async function image2image(input: Buffer, prompt: string): Promise<Buffer | unde
     const resp = await fetch('https://api.deepai.org/api/image-editor', {
       method: 'POST',
       headers: {
-        'api-key':  process.env.DEEPAI_API_KEY! 
+        'api-key':  process.env.NEXT_PUBLIC_DEEPAI_API_KEY! 
       },
       body: formData
     });
@@ -463,7 +463,7 @@ async function image2image(input: Buffer, prompt: string): Promise<Buffer | unde
 
 
 const run=()=>{
-  console.log(process.env.TRIGGER_API_SECRET)
+  console.log(process.env.NEXT_PUBLIC_TRIGGER_API_SECRET)
 }
 
 run()
