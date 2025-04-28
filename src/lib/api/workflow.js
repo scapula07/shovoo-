@@ -4,7 +4,7 @@ import { tasks, configure } from "@trigger.dev/sdk/v3";
 import { getPersistedImages } from "@/utils";
 
 configure({
-  secretKey: "tr_dev_j0McrUUIiFQOtBokPDoH",
+  secretKey:process.env.TRIGGER_API_SECRET ,
 });
 
 import { auth, db } from "@/firebase/config";
