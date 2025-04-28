@@ -159,7 +159,7 @@ export const workflowApi = {
     }
   },
   queueWorkflow: async function (executionGraph, id,assets) {
-    console.log(process.env.TRIGGER_API_SECRET,"key")
+    console.log(process.env.NEXT_PUBLIC_TRIGGER_API_SECRET ,"key")
      const files = await getPersistedImages();
    
      if (files.length === 0) {
