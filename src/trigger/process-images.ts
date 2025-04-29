@@ -45,7 +45,7 @@ const simulateProcessing = async (label: string, delay = 1500) => {
 export const processImageWorkflow = task({
   id: "process-image-workflow",
   run: async ({ executionGraph, workflowId, files }: Payload) => {
-    console.log(files, "Initial Files");
+    
 
     const nodes = Object.values(executionGraph);
     const startNode = nodes[0];
@@ -64,9 +64,11 @@ export const processImageWorkflow = task({
       processedImages.push(Buffer.from(buffer));
     }
 
-    console.log(processedImages,"processed images")
+  
 
     const visited = new Set<string>();
+    const altTexts: string[] = [];
+
 
     while (currentNode) {
       if (visited.has(currentNode.id)) break;
@@ -143,7 +145,7 @@ export const processImageWorkflow = task({
           case "Image-to-text":
             for (const img of processedImages) {
               const withText = await imageToText(img,);
-              
+              altTexts.push(withText); 
             }
     
             break;
@@ -190,7 +192,7 @@ export const processImageWorkflow = task({
 
 
 
-    const uploadedUrls: string[] = [];
+    const uploadedUrls: { url: string; alt: string }[] = []; 
 
     for (let i = 0; i < processedImages.length; i++) {
         const base64Image = processedImages[i].toString("base64");
@@ -201,7 +203,11 @@ export const processImageWorkflow = task({
    
         const downloadURL=`https://firebasestorage.googleapis.com/v0/b/${snapshot?.metadata?.bucket}/o/${encodeURIComponent(snapshot?.metadata?.fullPath)}?alt=media`
    
-      uploadedUrls.push(downloadURL);
+        uploadedUrls.push({
+          url: downloadURL,
+          alt: altTexts[i] || "", // link alt to url
+        });
+      
     }
 
     console.log(uploadedUrls,"urls")
@@ -209,7 +215,7 @@ export const processImageWorkflow = task({
 
     return {
       status: "completed",
-      images:uploadedUrls, 
+      result:uploadedUrls, 
     };
   },
 });
@@ -407,26 +413,37 @@ function bufferToBlob(buffer: Buffer, type: string): Blob {
 }
 
 async function imageToText(input:Buffer) {
-  const endpoint = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-large';
-  const token = process.env.NEXT_PUBLIC_HF_API_KEY; // Replace with your actual token
-
-  const imageFile = bufferToBlob(input, 'image/png');
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'image/jpeg'
-    },
-    body: imageFile
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
+  try{
+    console.log(process.env.NEXT_PUBLIC_HF_API_KEY,"image")
+    const endpoint = 'https://dream-gateway.livepeer.cloud/image-to-text';
+    const token = process.env.NEXT_PUBLIC_HF_API_KEY; // Replace with your actual token
+  
+    const imageFile = bufferToBlob(input, 'image/png');
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("model_id", "Salesforce/blip-image-captioning-large");
+    // formData.append('prompt','t');
+  
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+       
+      },
+      body: formData as any
+    });
+  
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+  
+    const result:any = await response.json();
+    console.log(result,"r")
+    return result?.text;
+  }catch(e){
+    console.log(e)
   }
 
-  const result = await response.json();
-  return result;
 }
 
 
@@ -461,9 +478,3 @@ async function image2image(input: Buffer, prompt: string): Promise<Buffer | unde
   }
 }
 
-
-const run=()=>{
-  console.log(process.env.NEXT_PUBLIC_TRIGGER_API_SECRET)
-}
-
-run()

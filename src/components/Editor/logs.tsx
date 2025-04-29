@@ -16,6 +16,7 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
      accessToken: workflow?.accessToken , // This is required
   });
   const status= run?.status as string
+  const hasAltText = run?.output?.result?.some((item:any)=> item.alt && item.alt.trim() !== '');
 
 
   const downloadImagesAsZip = async () => {
@@ -23,16 +24,15 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
     const folder = zip.folder("images");
 
     await Promise.all(
-      run?.output?.images?.map(async (url:string, index:number) => {
-        const proxiedUrl = `/api/image?url=${encodeURIComponent(url)}`;
+      run?.output?.result?.map(async (i:any, index:number) => {
+        const proxiedUrl = `/api/image?url=${encodeURIComponent(i?.url)}`;
 
         const response = await fetch(proxiedUrl);
         const blob = await response.blob();
         console.log(blob,"bb")
         const contentType = response.headers.get('content-type');
         const ext = contentType?.includes('png') ? 'png' : 'jpg'; // or parse it smarter
-        folder?.file(`image-${index + 1}.${ext}`, blob);
-        
+        folder?.file(`image-${index + 1}.${ext}`, blob);  
 
       })
     );
@@ -42,6 +42,28 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
     });
   };
 
+  const downloadCSV = () => {
+    if (!run?.output?.result?.length) return;
+  
+    const headers = Object.keys(run.output.result[0]);
+    const rows = run.output.result.map((obj:any)=>
+      headers.map(header => `"${(obj[header] ?? '').toString().replace(/"/g, '""')}"`).join(',')
+    );
+  
+    const csvContent = [headers.join(','), ...rows].join('\n');
+  
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+  
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+
   return (
     <div className='w-full'>
             <div className={`flex items-center w-full justify-between px-4 py-4 bg-gray-200`}>
@@ -50,7 +72,7 @@ export default function Logs({block,setOpen,workflow}:{block:any,setOpen:Dispatc
                     </div>
 
                     <div className='flex items-center space-x-3'>
-                        <IoMdDownload  className='text-xl cursor-pointer' onClick={downloadImagesAsZip}/>
+                        <IoMdDownload  className='text-xl cursor-pointer' onClick={hasAltText?downloadCSV:downloadImagesAsZip}/>
                         <IoMdClose
                           className='text-xl'
                           onClick={()=>setOpen(false)}
@@ -96,7 +118,8 @@ const DropDownMenu=({run}:any)=>{
     const [open,setOpen]=useState(false)
     const date = new Date(run?.finishedAt);
     const readable = formatDistanceToNow(date, { addSuffix: true });
-    
+    const hasAltText = run?.output?.result?.some((item:any)=> item.alt && item.alt.trim() !== '');
+    const gridColsClass = hasAltText ? 'grid-cols-1' : 'grid-cols-3';
 
    return(
       <div className='flex flex-col px-4 py-4 border-b w-full'>
@@ -110,10 +133,14 @@ const DropDownMenu=({run}:any)=>{
                
            </div>
            {open&&
-           <div className='w-full grid grid-cols-3  gap-4 py-8 '>
-                 {run?.output?.images?.map((i:any)=>{
+         <div className={`w-full grid ${gridColsClass} gap-4 py-8`}>
+                 {run?.output?.result?.map((i:any)=>{
                     return(
-                        <img src={i} className="h-44"/>
+                        <div className='flex flex-col w-full space-y-4'>
+                                <img src={i?.url} className="h-44"/>
+                                <h5 className='font-light text-slate-800 text-sm'>Description: {i?.alt}</h5>
+                        </div>
+                     
                       )
                  })}
              </div>

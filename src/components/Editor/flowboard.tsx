@@ -64,7 +64,8 @@ export default function FlowBoard({
     (params: any) => setEdges((eds: any) => addEdge(params, eds)),
     []
   );
-
+ 
+  console.log(graph,"graph")
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -239,7 +240,7 @@ export default function FlowBoard({
       newNodes.push({
         id: node.id,
         type: "blockNode",
-        position: { x: Math.random() * 300, y: Math.random() * 300 },
+        position: { x: Math.random() * 100, y: Math.random() * 100 },
         data: {
           id: node.id,
           label: node.class_type,

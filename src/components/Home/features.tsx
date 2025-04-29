@@ -8,28 +8,28 @@ export default function Features() {
 
          <div className='flex space-x-4 py-3'>
             {
-                [
-                  {
-                    icon:"",
-                    label:"Connect Your Media Ecosystem",
-                    dsc:"Easily integrate with services like  Shopify, webflow and wordpress to automate workflows, keeping your media operations seamless, consistent, and always in sync across your ecosystem."
-                  } ,
-                  {
-                    icon:"",
-                    label:"Tailored Tools for Smarter Media Management",
-                    dsc:"Leverage built-in tools designed specifically for media workflows"
-                  } ,
-                  {
-                    icon:"",
-                    label:"Enhance Media with AI-Powered Tools",
-                    dsc:"Leverage AI for auto-tagging, content analysis, smart recommendations, and more to supercharge your media workflows"
-                  },
-                  {
-                    icon:"",
-                    label:"",
-                    dsc:""
-                  }    
-                ].map((item)=>{
+                    [
+                      {
+                        icon: "",
+                        label: "Connect Your Media Ecosystem",
+                        dsc: "Easily integrate with services like Shopify, Webflow, and WordPress to automate workflows, keeping your media operations seamless, consistent, and always in sync across your ecosystem."
+                      },
+                      {
+                        icon: "",
+                        label: "Tailored Tools for Smarter Media Management",
+                        dsc: "Leverage built-in tools designed specifically for media workflows — including cropping, resizing, background removal, text overlays, and batch processing."
+                      },
+                      {
+                        icon: "",
+                        label: "Enhance Media with AI-Powered Tools",
+                        dsc: "Use AI for image-to-image generation, text-to-image creation, auto-tagging, content analysis, and smart media recommendations — all integrated natively."
+                      },
+                      {
+                        icon: "",
+                        label: "Visual Workflow Builder with Drag-and-Drop Simplicity",
+                        dsc: "Design complex automations using an intuitive, node-based builder. Set up triggers, batching, and scheduled actions with no technical skills required."
+                      }
+                    ].map((item)=>{
                     return(
                         <div className='bg-[#F4F5FA] w-full h-60 flex flex-col py-4 px-4 space-y-4'>
                             <h5></h5>
