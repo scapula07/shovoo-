@@ -252,7 +252,7 @@ export default function FlowBoard({
       if (node.next) {
         console.log(node.next,Object.values(workflow?.executionGraph),"next")
         const targetNode :any = Object.values(workflow?.executionGraph).find(
-          (n: any) => n.class_type === node.next
+          (n: any) => n.meta.title === node.next
          );
          console.log(targetNode,"targer")
         if (targetNode) {
