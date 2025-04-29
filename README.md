@@ -1,40 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Shovoo!
 
-## Getting Started
+## Content
+1. [Overview](#overview)
+2. [Features](#features)
+3. [How to Create Media Automations in Shovoo! - Step-by-Step](#how-to-create-media-automations-in-shovoo---step-by-step)
+4. [Managing Your Automations](#managing-your-automations)
+5. [Troubleshooting](#troubleshooting)
 
-First, run the development server:
+## Overview
+**Shovoo!** is a no-code, web-based application with a drag-and-drop interface, enabling users to create workflows for media automation easily.  
+This milestone focuses on CMS integration and advanced image-specific tasks, such as bulk background replacement and batch editing.  
+Users can set up triggers, schedule automations, or batch process tasks effortlessly, without writing a single line of code.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- **Shopify Integration**: Seamlessly connect your Shopify store to automate media tasks on your product images.
+- **Drag-and-Drop, Graphical Node UI**: Build workflows visually using a ComfyUI-like interface with nodes and connectors.
+- **Built-in Image Editing Tools**: Crop, resize, apply filters, add text overlays, and replace backgrounds in bulk.
+- **Livepeer AI Pipelines**: Integrate powerful AI features including:
+  - Image-to-Image
+  - Image-to-Text
+  - Text-to-Image
+- **Flexible Automation Options**:
+  - Trigger-based automations (event-driven)
+  - Scheduler-based automations (time-driven)
+  - Batch processing (bulk-driven)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How to Create Media Automations in Shovoo! - Step-by-Step
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Step 1: Access the Shovoo! Platform
+Visit [https://www.shovoo.app](https://shovool.vercel.app/). Create an account or log in with your existing credentials.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Step 2: Connect CMS or Shopify Store
+Navigate to the **Integrations** panel and connect your CMS or Shopify store by authorizing access.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Step 3: Build Your Workflow
+- Open the **Workflow Builder**.
+- Drag and drop nodes for tasks like "Fetch Images," "Crop," "Background Replace," or "Upload to CMS."
+- Configure each node’s parameters (e.g., image dimensions, background color, AI model selection).
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Step 4: Set Triggers or Schedulers
+- Choose how the automation should run:
+  - Trigger on new uploads
+  - Schedule daily, weekly, or monthly runs
+  - Manually batch process selected assets
 
-## Learn More
+### Step 5: Test and Launch
+Preview the workflow on sample images before going live.  
+Activate the workflow once satisfied with the setup.
 
-To learn more about Next.js, take a look at the following resources:
+## Managing Your Automations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+- **Dashboard Metrics**: Monitor the status of automations, task queues, and error logs from the main dashboard.
+- **Editing a Workflow**: Pause any workflow, edit the task nodes, and resume without starting from scratch.
+- **Batch History**: Review the history of batch runs, including success rates and failed operations for debugging.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Troubleshooting
 
-## Deploy on Vercel
+### Issue: Workflow stuck on a node
+- **Possible Cause**: Invalid file formats or CMS authentication issues.
+- **Solution**: Check node settings and ensure proper CMS/API credentials.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Issue: Automation trigger not firing
+- **Possible Cause**: CMS webhook might not be properly set or permissions might be missing.
+- **Solution**: Reconnect your integration and verify webhook permissions.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### Issue: Livepeer AI task failing
+- **Possible Cause**: API limits or model unavailability.
+- **Solution**: Retry after a few minutes or check your usage quota.
+
+---
+
+Need more help?  
+Contact us at **support@shovoo.app** with your workflow ID.
