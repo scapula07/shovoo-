@@ -1,40 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Livepeer Gateway wizard[GWID]
 
-## Getting Started
+## Content
+1. Overview
+2. Features
 
-First, run the development server:
+### Overview
+GWID is a simple UI launcher that enables single-button-click deployment and auto-scaling for the Livepeer stack, focusing on Gateway (Transcoding and AI) on any cloud provider.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Features
+1. Multi-cloud deployment:deploy on multiple cloud providers (AWS, Google Cloud, Azure) or even on-premise setups.
+2. Management Tools: Metrics dashboard and funding web portal for Gateway
+3. Preloaded templates with common settings for transcoding Options Configuration
+4. Web shell interface to interact with Livepeer cli
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### How to deploy a gateway on GWID - step-by-step
+Step 1: Access the GWID Platform at https://www.gwid.io/. Create an account on the platform by requesting access from our support team gwidhq@gmail.com.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Step 2: Select Deployment Type. Choose Transcoding Gateway or AI Gateway depending on your use case.
 
-## Learn More
+Step 3: Configure Gateway Settings.
 
-To learn more about Next.js, take a look at the following resources:
+Select the desired Cloud Provider (AWS, GCP, or Azure).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+Region: Select the preferred cloud region.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Select a Transcoding profiles or profiles
 
-## Deploy on Vercel
+Enter a Gateway name, Arbitrum RPC endpoint and a passphrase/password
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Step 4: Generate an ETH account using the web interactive terminal shell.Enter a passphrase to unlock your ETH account.
+
+Step 5: Fund your Gateway ETH address with Arbitrum ETHER using the funding web panel to deposit and allocate ETH fund.
+
+Step 6: Testing & Verification. Use the provided Node Endpoint/IP to publish a test stream.
+
+
+### Managing Your Gateway
+
+1. Real-time Metrics : View metrics such as resource usage (CPU and memory) ,  and funding balance in the GWID dashboard.
+2. Funding the Gateway: Use the Funding Panel in the GWID UI to deposit funds. Allocate funds directly from your connected wallet.
+3. Terminating a Gateway: Navigate to the Terminate panel to shut down a specific gateway instance. Ensure you withdraw any remaining funds before termination.
+
+
+### Troubleshooting
+
+1. Deployment Issues
+    Issue: Gateway stuck in "Deploying... or initializing..."
+    🔹 Might be due to resources limit.
+    
+    🔹 Send us an email with your gateway id and name at gwidhq@gmail.com.
+
