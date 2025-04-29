@@ -1,56 +1,74 @@
-# Livepeer Gateway wizard[GWID]
+# Shovoo!
 
 ## Content
-1. Overview
-2. Features
+1. [Overview](#overview)
+2. [Features](#features)
+3. [How to Create Media Automations in Shovoo! - Step-by-Step](#how-to-create-media-automations-in-shovoo---step-by-step)
+4. [Managing Your Automations](#managing-your-automations)
+5. [Troubleshooting](#troubleshooting)
 
-### Overview
-GWID is a simple UI launcher that enables single-button-click deployment and auto-scaling for the Livepeer stack, focusing on Gateway (Transcoding and AI) on any cloud provider.
+## Overview
+**Shovoo!** is a no-code, web-based application with a drag-and-drop interface, enabling users to create workflows for media automation easily.  
+This milestone focuses on CMS integration and advanced image-specific tasks, such as bulk background replacement and batch editing.  
+Users can set up triggers, schedule automations, or batch process tasks effortlessly, without writing a single line of code.
 
+## Features
+- **Shopify Integration**: Seamlessly connect your Shopify store to automate media tasks on your product images.
+- **Drag-and-Drop, Graphical Node UI**: Build workflows visually using a ComfyUI-like interface with nodes and connectors.
+- **Built-in Image Editing Tools**: Crop, resize, apply filters, add text overlays, and replace backgrounds in bulk.
+- **Livepeer AI Pipelines**: Integrate powerful AI features including:
+  - Image-to-Image
+  - Image-to-Text
+  - Text-to-Image
+- **Flexible Automation Options**:
+  - Trigger-based automations (event-driven)
+  - Scheduler-based automations (time-driven)
+  - Batch processing (bulk-driven)
 
+## How to Create Media Automations in Shovoo! - Step-by-Step
 
-### Features
-1. Multi-cloud deployment:deploy on multiple cloud providers (AWS, Google Cloud, Azure) or even on-premise setups.
-2. Management Tools: Metrics dashboard and funding web portal for Gateway
-3. Preloaded templates with common settings for transcoding Options Configuration
-4. Web shell interface to interact with Livepeer cli
+### Step 1: Access the Shovoo! Platform
+Visit [https://www.shovoo.app](https://shovool.vercel.app/). Create an account or log in with your existing credentials.
 
+### Step 2: Connect CMS or Shopify Store
+Navigate to the **Integrations** panel and connect your CMS or Shopify store by authorizing access.
 
-### How to deploy a gateway on GWID - step-by-step
-Step 1: Access the GWID Platform at https://www.gwid.io/. Create an account on the platform by requesting access from our support team gwidhq@gmail.com.
+### Step 3: Build Your Workflow
+- Open the **Workflow Builder**.
+- Drag and drop nodes for tasks like "Fetch Images," "Crop," "Background Replace," or "Upload to CMS."
+- Configure each node’s parameters (e.g., image dimensions, background color, AI model selection).
 
-Step 2: Select Deployment Type. Choose Transcoding Gateway or AI Gateway depending on your use case.
+### Step 4: Set Triggers or Schedulers
+- Choose how the automation should run:
+  - Trigger on new uploads
+  - Schedule daily, weekly, or monthly runs
+  - Manually batch process selected assets
 
-Step 3: Configure Gateway Settings.
+### Step 5: Test and Launch
+Preview the workflow on sample images before going live.  
+Activate the workflow once satisfied with the setup.
 
-Select the desired Cloud Provider (AWS, GCP, or Azure).
+## Managing Your Automations
 
-Region: Select the preferred cloud region.
+- **Dashboard Metrics**: Monitor the status of automations, task queues, and error logs from the main dashboard.
+- **Editing a Workflow**: Pause any workflow, edit the task nodes, and resume without starting from scratch.
+- **Batch History**: Review the history of batch runs, including success rates and failed operations for debugging.
 
-Select a Transcoding profiles or profiles
+## Troubleshooting
 
-Enter a Gateway name, Arbitrum RPC endpoint and a passphrase/password
+### Issue: Workflow stuck on a node
+- **Possible Cause**: Invalid file formats or CMS authentication issues.
+- **Solution**: Check node settings and ensure proper CMS/API credentials.
 
+### Issue: Automation trigger not firing
+- **Possible Cause**: CMS webhook might not be properly set or permissions might be missing.
+- **Solution**: Reconnect your integration and verify webhook permissions.
 
-Step 4: Generate an ETH account using the web interactive terminal shell.Enter a passphrase to unlock your ETH account.
+### Issue: Livepeer AI task failing
+- **Possible Cause**: API limits or model unavailability.
+- **Solution**: Retry after a few minutes or check your usage quota.
 
-Step 5: Fund your Gateway ETH address with Arbitrum ETHER using the funding web panel to deposit and allocate ETH fund.
+---
 
-Step 6: Testing & Verification. Use the provided Node Endpoint/IP to publish a test stream.
-
-
-### Managing Your Gateway
-
-1. Real-time Metrics : View metrics such as resource usage (CPU and memory) ,  and funding balance in the GWID dashboard.
-2. Funding the Gateway: Use the Funding Panel in the GWID UI to deposit funds. Allocate funds directly from your connected wallet.
-3. Terminating a Gateway: Navigate to the Terminate panel to shut down a specific gateway instance. Ensure you withdraw any remaining funds before termination.
-
-
-### Troubleshooting
-
-1. Deployment Issues
-    Issue: Gateway stuck in "Deploying... or initializing..."
-    🔹 Might be due to resources limit.
-    
-    🔹 Send us an email with your gateway id and name at gwidhq@gmail.com.
-
+Need more help?  
+Contact us at **support@shovoo.app** with your workflow ID.
